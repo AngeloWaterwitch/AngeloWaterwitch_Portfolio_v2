@@ -1,0 +1,185 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  role      Role     @default(ADMIN)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+enum Role {
+  ADMIN
+  EDITOR
+  VIEWER
+}
+
+model HeroContent {
+  id             String   @id @default(cuid())
+  name           String
+  role           String
+  sub            String
+  resumeEnabled  Boolean  @default(true)
+  resumeUrl      String?
+  resumeLabel    String   @default("Download CV")
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model AboutContent {
+  id        String   @id @default(cuid())
+  bio1      String
+  bio2      String
+  years     String
+  projects  String
+  clients   String
+  standing  String
+  photoUrl  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Skill {
+  id        String   @id @default(cuid())
+  icon      String
+  name      String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Project {
+  id        String         @id @default(cuid())
+  title     String
+  desc      String
+  tags      String[]
+  link      String?
+  order     Int            @default(0)
+  media     ProjectMedia[]
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+}
+
+model ProjectMedia {
+  id        String   @id @default(cuid())
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  url       String
+  type      String   @default("image")
+  createdAt DateTime @default(now())
+}
+
+model Service {
+  id        String   @id @default(cuid())
+  num       String
+  title     String
+  desc      String
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model TimelineEvent {
+  id           String   @id @default(cuid())
+  type         String
+  title        String
+  organisation String
+  period       String
+  desc         String
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Testimonial {
+  id        String            @id @default(cuid())
+  quote     String
+  author    String
+  role      String?
+  status    TestimonialStatus @default(PENDING)
+  createdAt DateTime          @default(now())
+  updatedAt DateTime          @updatedAt
+}
+
+enum TestimonialStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+model ContactInfo {
+  id        String   @id @default(cuid())
+  email     String
+  phone     String?
+  location  String?
+  facebook  String?
+  linkedin  String?
+  instagram String?
+  github    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model SEOSettings {
+  id            String   @id @default(cuid())
+  title         String
+  description   String
+  keywords      String?
+  ogImage       String?
+  twitterHandle String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Branding {
+  id          String   @id @default(cuid())
+  logoText    String   @default("AW.")
+  logoUrl     String?
+  displayFont String   @default("Syne")
+  monoFont    String   @default("Space Mono")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model SiteSection {
+  id        String   @id @default(cuid())
+  sectionId String   @unique
+  label     String
+  visible   Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ActivityLog {
+  id        String   @id @default(cuid())
+  action    String
+  detail    String
+  userId    String?
+  createdAt DateTime @default(now())
+}
+
+model ResumeFile {
+  id        String   @id @default(cuid())
+  url       String
+  filename  String
+  enabled   Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
