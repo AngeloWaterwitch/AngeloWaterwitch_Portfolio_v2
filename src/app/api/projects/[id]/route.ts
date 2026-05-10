@@ -1,54 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/api-auth';
-import { sanitiseObject } from '@/lib/sanitise';
-import { z } from 'zod';
-
-const projectSchema = z.object({
-  title: z.string().min(1),
-  desc: z.string().min(1),
-  tags: z.array(z.string()),
-  link: z.string().optional(),
-  order: z.number().optional(),
-});
+import { revalidatePath } from 'next/cache';
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { error } = await requireAuth();
   if (error) return error;
-
+  const { id } = await params;
   try {
     const body = await req.json();
-    const parsed = projectSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
-    }
-
-    const { tags, ...rest } = parsed.data;
+    const { tags, media, createdAt, updatedAt, id: bodyId, ...rest } = body;
     const project = await prisma.project.update({
-      where: { id: params.id },
-      data: { ...sanitiseObject(rest), tags },
+      where: { id },
+      data: {
+        ...rest,
+        tags: Array.isArray(tags) ? tags : tags.split(',').map((t: string) => t.trim()),
+      },
       include: { media: true },
     });
+    revalidatePath('/');
     return NextResponse.json(project);
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to update project' }, { status: 500 });
+  } catch (e) {
+    console.error(e);
+    return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { error } = await requireAuth();
   if (error) return error;
-
+  const { id } = await params;
   try {
-    await prisma.project.delete({ where: { id: params.id } });
+    await prisma.project.delete({ where: { id } });
+    revalidatePath('/');
     return NextResponse.json({ success: true });
-  } catch (error) {
-    return NextResponse.json({ error: 'Failed to delete project' }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

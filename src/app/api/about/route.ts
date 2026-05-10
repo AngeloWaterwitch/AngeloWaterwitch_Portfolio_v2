@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/api-auth';
@@ -6,8 +7,10 @@ import { sanitiseObject } from '@/lib/sanitise';
 export async function GET() {
   try {
     const about = await prisma.aboutContent.findFirst();
+    revalidatePath('/');
     return NextResponse.json(about);
   } catch {
+    revalidatePath('/');
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
@@ -22,8 +25,10 @@ export async function PUT(req: NextRequest) {
     const about = existing
       ? await prisma.aboutContent.update({ where: { id: existing.id }, data: clean })
       : await prisma.aboutContent.create({ data: clean });
+    revalidatePath('/');
     return NextResponse.json(about);
   } catch {
+    revalidatePath('/');
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

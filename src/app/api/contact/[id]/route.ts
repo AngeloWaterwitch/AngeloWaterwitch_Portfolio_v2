@@ -4,34 +4,34 @@ import { requireAuth } from '@/lib/api-auth';
 
 export async function PUT(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { error } = await requireAuth();
   if (error) return error;
-
+  const { id } = await params;
   try {
     const body = await req.json();
     const message = await prisma.contactMessage.update({
-      where: { id: params.id },
+      where: { id },
       data: { read: body.read },
     });
     return NextResponse.json(message);
-  } catch (err) {
-    return NextResponse.json({ error: 'Failed to update message' }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
 
 export async function DELETE(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const { error } = await requireAuth();
   if (error) return error;
-
+  const { id } = await params;
   try {
-    await prisma.contactMessage.delete({ where: { id: params.id } });
+    await prisma.contactMessage.delete({ where: { id } });
     return NextResponse.json({ success: true });
-  } catch (err) {
-    return NextResponse.json({ error: 'Failed to delete message' }, { status: 500 });
+  } catch {
+    return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

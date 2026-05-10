@@ -81,36 +81,54 @@ export default function AdminPage() {
           fontFamily: "'Syne', sans-serif",
           fontWeight: 800,
           fontSize: '1.1rem',
+          color: '#f0ede8',
         }}>
           ⚙ Admin <span style={{ color: 'hsl(348,100%,55%)' }}>Dashboard</span>
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <a
-            href="/"
+        href="/"
             target="_blank"
+            rel="noreferrer noopener"
+            onMouseEnter={e => {
+              e.currentTarget.style.color = 'hsl(348,100%,55%)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.color = '#aaa';
+            }}
             style={{
               fontFamily: "'Space Mono', monospace",
               fontSize: '0.7rem',
-              color: '#666',
+              color: '#aaa',
               letterSpacing: '0.08em',
               textDecoration: 'none',
+              transition: 'color 0.2s',
             }}
           >
             View Site →
           </a>
           <button
             onClick={() => signOut({ callbackUrl: '/admin/login' })}
+            onMouseEnter={e => {
+              e.currentTarget.style.borderColor = 'hsl(348,100%,55%)';
+              e.currentTarget.style.color = 'hsl(348,100%,55%)';
+            }}
+            onMouseLeave={e => {
+              e.currentTarget.style.borderColor = '#555';
+              e.currentTarget.style.color = '#ccc';
+            }}
             style={{
               padding: '0.4rem 1rem',
               background: 'transparent',
-              border: '1px solid #333',
-              color: '#888',
+              border: '1px solid #555',
+              color: '#ccc',
               fontFamily: "'Space Mono', monospace",
               fontSize: '0.7rem',
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
               borderRadius: '1px',
               cursor: 'pointer',
+              transition: 'all 0.2s',
             }}
           >
             Sign Out
@@ -132,30 +150,42 @@ export default function AdminPage() {
           height: 'calc(100vh - 60px)',
           overflowY: 'auto',
         }}>
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              style={{
-                display: 'block',
-                width: '100%',
-                padding: '0.7rem 1.5rem',
-                background: activeTab === tab.id ? 'rgba(220,30,60,0.1)' : 'transparent',
-                border: 'none',
-                borderLeft: activeTab === tab.id ? '2px solid hsl(348,100%,55%)' : '2px solid transparent',
-                color: activeTab === tab.id ? 'hsl(348,100%,55%)' : '#666',
-                fontFamily: "'Space Mono', monospace",
-                fontSize: '0.72rem',
-                letterSpacing: '0.08em',
-                textAlign: 'left',
-                cursor: 'pointer',
-                transition: 'all 0.15s',
-                textTransform: 'uppercase',
-              }}
-            >
-              {tab.label}
-            </button>
-          ))}
+{tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                onMouseEnter={e => {
+                  if (activeTab !== tab.id) {
+                    e.currentTarget.style.color = '#f0ede8';
+                    e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                  }
+                }}
+                onMouseLeave={e => {
+                  if (activeTab !== tab.id) {
+                    e.currentTarget.style.color = '#bbb';
+                    e.currentTarget.style.background = 'transparent';
+                  }
+                }}
+                style={{
+                  display: 'block',
+                  width: '100%',
+                  padding: '0.7rem 1.5rem',
+                  background: activeTab === tab.id ? 'rgba(220,30,60,0.15)' : 'transparent',
+                  border: 'none',
+                  borderLeft: activeTab === tab.id ? '3px solid hsl(348,100%,55%)' : '3px solid transparent',
+                  color: activeTab === tab.id ? 'hsl(348,100%,55%)' : '#bbb',
+                  fontFamily: "'Space Mono', monospace",
+                  fontSize: '0.72rem',
+                  letterSpacing: '0.08em',
+                  textAlign: 'left',
+                  cursor: 'pointer',
+                  transition: 'all 0.15s',
+                  textTransform: 'uppercase',
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
         </div>
 
         {/* Main content */}
@@ -188,6 +218,7 @@ function HeroTab({ data, onRefetch }: any) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
     });
+    await fetch('/api/revalidate', { method: 'POST' });
     onRefetch();
   };
 
@@ -226,6 +257,7 @@ function AboutTab({ data, onRefetch }: any) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
     });
+    await fetch('/api/revalidate', { method: 'POST' });
     onRefetch();
   };
 
@@ -261,12 +293,13 @@ function AboutTab({ data, onRefetch }: any) {
 function SkillsTab({ data, onRefetch }: any) {
   const [skills, setSkills] = useState(data.skills || []);
 
-  const save = async () => {
+  const saveAll = async () => {
     await fetch('/api/skills', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(skills),
     });
+    await fetch('/api/revalidate', { method: 'POST' });
     onRefetch();
   };
 
@@ -282,75 +315,42 @@ function SkillsTab({ data, onRefetch }: any) {
 
   const removeSkill = async (id: string) => {
     await fetch(`/api/skills/${id}`, { method: 'DELETE' });
-    setSkills(skills.filter((s: any) => s.id !== id));
+    setSkills((prev: any[]) => prev.filter(s => s.id !== id));
+    await fetch('/api/revalidate', { method: 'POST' });
   };
 
   return (
     <div>
       <AdminLabel>Skills</AdminLabel>
+      <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', color: '#666', marginBottom: '1rem' }}>
+        Edit skills below then click Save All Skills
+      </p>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', marginBottom: '1rem' }}>
         {skills.map((skill: any, i: number) => (
-          <div key={skill.id} style={{
-            background: '#111',
-            border: '1px solid #1a1a1a',
-            borderRadius: '2px',
-            padding: '1rem',
-            display: 'flex',
-            gap: '1rem',
-            alignItems: 'center',
-          }}>
+          <div key={skill.id} style={{ background: '#111', border: '1px solid #1a1a1a', borderRadius: '2px', padding: '1rem', display: 'flex', gap: '1rem', alignItems: 'center' }}>
             <input
-              value={skill.icon}
+              value={skill.icon || ''}
               onChange={e => {
                 const arr = [...skills];
                 arr[i] = { ...arr[i], icon: e.target.value };
                 setSkills(arr);
               }}
-              placeholder="emoji or URL"
-              style={{
-                width: '140px',
-                background: '#0a0a0a',
-                border: '1px solid #222',
-                color: '#f0ede8',
-                padding: '0.5rem',
-                fontFamily: "'Syne', sans-serif",
-                fontSize: '0.85rem',
-                borderRadius: '1px',
-                outline: 'none',
-              }}
+              placeholder="emoji or image URL"
+              style={{ width: '140px', background: '#0a0a0a', border: '1px solid #222', color: '#f0ede8', padding: '0.5rem', fontFamily: "'Syne', sans-serif", fontSize: '0.85rem', borderRadius: '1px', outline: 'none' }}
             />
             <input
-              value={skill.name}
+              value={skill.name || ''}
               onChange={e => {
                 const arr = [...skills];
                 arr[i] = { ...arr[i], name: e.target.value };
                 setSkills(arr);
               }}
               placeholder="Skill name"
-              style={{
-                flex: 1,
-                background: '#0a0a0a',
-                border: '1px solid #222',
-                color: '#f0ede8',
-                padding: '0.5rem',
-                fontFamily: "'Syne', sans-serif",
-                fontSize: '0.85rem',
-                borderRadius: '1px',
-                outline: 'none',
-              }}
+              style={{ flex: 1, background: '#0a0a0a', border: '1px solid #222', color: '#f0ede8', padding: '0.5rem', fontFamily: "'Syne', sans-serif", fontSize: '0.85rem', borderRadius: '1px', outline: 'none' }}
             />
             <button
               onClick={() => removeSkill(skill.id)}
-              style={{
-                padding: '0.4rem 0.8rem',
-                background: 'transparent',
-                border: '1px solid #333',
-                color: '#666',
-                fontFamily: "'Space Mono', monospace",
-                fontSize: '0.7rem',
-                borderRadius: '1px',
-                cursor: 'pointer',
-              }}
+              style={{ padding: '0.4rem 0.8rem', background: 'transparent', border: '1px solid #333', color: '#666', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', borderRadius: '1px', cursor: 'pointer', flexShrink: 0 }}
             >
               Remove
             </button>
@@ -360,20 +360,11 @@ function SkillsTab({ data, onRefetch }: any) {
       <div style={{ display: 'flex', gap: '1rem' }}>
         <button
           onClick={addSkill}
-          style={{
-            padding: '0.6rem 1.2rem',
-            background: 'transparent',
-            border: '1px dashed #333',
-            color: '#666',
-            fontFamily: "'Space Mono', monospace",
-            fontSize: '0.72rem',
-            borderRadius: '1px',
-            cursor: 'pointer',
-          }}
+          style={{ padding: '0.6rem 1.2rem', background: 'transparent', border: '1px dashed #333', color: '#666', fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', borderRadius: '1px', cursor: 'pointer' }}
         >
           + Add Skill
         </button>
-        <SaveButton onSave={save} />
+        <SaveButton onSave={saveAll} label="Save All Skills" />
       </div>
     </div>
   );
@@ -382,6 +373,22 @@ function SkillsTab({ data, onRefetch }: any) {
 // ─── PROJECTS TAB ───────────────────────────────────────────
 function ProjectsTab({ data, onRefetch }: any) {
   const [projects, setProjects] = useState(data.projects || []);
+
+  const saveProject = async (project: any) => {
+    await fetch(`/api/projects/${project.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title: project.title,
+        desc: project.desc,
+        tags: Array.isArray(project.tags) ? project.tags : project.tags.split(',').map((t: string) => t.trim()),
+        link: project.link,
+        order: project.order,
+      }),
+    });
+    await fetch('/api/revalidate', { method: 'POST' });
+    onRefetch();
+  };
 
   const addProject = async () => {
     const res = await fetch('/api/projects', {
@@ -399,26 +406,19 @@ function ProjectsTab({ data, onRefetch }: any) {
     setProjects([...projects, project]);
   };
 
-  const updateProject = async (project: any) => {
-    await fetch(`/api/projects/${project.id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(project),
-    });
-    onRefetch();
-  };
-
   const removeProject = async (id: string) => {
     await fetch(`/api/projects/${id}`, { method: 'DELETE' });
-    setProjects(projects.filter((p: any) => p.id !== id));
+    setProjects((prev: any[]) => prev.filter(p => p.id !== id));
+    await fetch('/api/revalidate', { method: 'POST' });
   };
 
   const handleImageUpload = async (projectId: string, url: string) => {
-    const res = await fetch('/api/projects/media', {
+    await fetch('/api/projects/media', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ projectId, url, type: 'image' }),
     });
+    await fetch('/api/revalidate', { method: 'POST' });
     onRefetch();
   };
 
@@ -427,75 +427,39 @@ function ProjectsTab({ data, onRefetch }: any) {
       <AdminLabel>Projects</AdminLabel>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
         {projects.map((project: any, i: number) => (
-          <div key={project.id} style={{
-            background: '#111',
-            border: '1px solid #1a1a1a',
-            borderRadius: '2px',
-            padding: '1.5rem',
-          }}>
+          <div key={project.id} style={{ background: '#111', border: '1px solid #1a1a1a', borderRadius: '2px', padding: '1.5rem' }}>
             <AdminGrid>
               <AdminField
                 label="Title"
-                value={project.title}
-                onChange={v => {
-                  const arr = [...projects];
-                  arr[i] = { ...arr[i], title: v };
-                  setProjects(arr);
-                }}
+                value={project.title || ''}
+                onChange={v => { const arr = [...projects]; arr[i] = { ...arr[i], title: v }; setProjects(arr); }}
               />
               <AdminField
                 label="Link"
-                value={project.link}
-                onChange={v => {
-                  const arr = [...projects];
-                  arr[i] = { ...arr[i], link: v };
-                  setProjects(arr);
-                }}
+                value={project.link || ''}
+                onChange={v => { const arr = [...projects]; arr[i] = { ...arr[i], link: v }; setProjects(arr); }}
               />
               <AdminField
                 label="Tags (comma separated)"
-                value={Array.isArray(project.tags) ? project.tags.join(', ') : project.tags}
-                onChange={v => {
-                  const arr = [...projects];
-                  arr[i] = { ...arr[i], tags: v.split(',').map((t: string) => t.trim()) };
-                  setProjects(arr);
-                }}
+                value={Array.isArray(project.tags) ? project.tags.join(', ') : project.tags || ''}
+                onChange={v => { const arr = [...projects]; arr[i] = { ...arr[i], tags: v }; setProjects(arr); }}
                 fullWidth
               />
               <AdminField
                 label="Description"
-                value={project.desc}
-                onChange={v => {
-                  const arr = [...projects];
-                  arr[i] = { ...arr[i], desc: v };
-                  setProjects(arr);
-                }}
+                value={project.desc || ''}
+                onChange={v => { const arr = [...projects]; arr[i] = { ...arr[i], desc: v }; setProjects(arr); }}
                 textarea
                 fullWidth
               />
             </AdminGrid>
 
-            {/* Project media */}
             <div style={{ marginTop: '1rem' }}>
-              <div style={{
-                fontFamily: "'Space Mono', monospace",
-                fontSize: '0.68rem',
-                color: '#555',
-                letterSpacing: '0.1em',
-                textTransform: 'uppercase',
-                marginBottom: '0.8rem',
-              }}>
-                Project Images
-              </div>
+              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.8rem' }}>Project Images</div>
               {project.media && project.media.length > 0 && (
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
                   {project.media.map((m: any) => (
-                    <img
-                      key={m.id}
-                      src={m.url}
-                      alt="Project media"
-                      style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '2px' }}
-                    />
+                    <img key={m.id} src={m.url} alt="Project" style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '2px' }} />
                   ))}
                 </div>
               )}
@@ -508,19 +472,10 @@ function ProjectsTab({ data, onRefetch }: any) {
             </div>
 
             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-              <SaveButton onSave={() => updateProject(projects[i])} label="Save Project" />
+              <SaveButton onSave={() => saveProject(projects[i])} label="Save Project" />
               <button
                 onClick={() => removeProject(project.id)}
-                style={{
-                  padding: '0.6rem 1rem',
-                  background: 'transparent',
-                  border: '1px solid #333',
-                  color: '#666',
-                  fontFamily: "'Space Mono', monospace",
-                  fontSize: '0.7rem',
-                  borderRadius: '1px',
-                  cursor: 'pointer',
-                }}
+                style={{ padding: '0.6rem 1rem', background: 'transparent', border: '1px solid #333', color: '#666', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', borderRadius: '1px', cursor: 'pointer' }}
               >
                 Remove
               </button>
@@ -531,17 +486,7 @@ function ProjectsTab({ data, onRefetch }: any) {
       <div style={{ marginTop: '1rem' }}>
         <button
           onClick={addProject}
-          style={{
-            padding: '0.8rem',
-            width: '100%',
-            background: 'transparent',
-            border: '1px dashed #333',
-            color: '#666',
-            fontFamily: "'Space Mono', monospace",
-            fontSize: '0.75rem',
-            borderRadius: '1px',
-            cursor: 'pointer',
-          }}
+          style={{ padding: '0.8rem', width: '100%', background: 'transparent', border: '1px dashed #333', color: '#666', fontFamily: "'Space Mono', monospace", fontSize: '0.75rem', borderRadius: '1px', cursor: 'pointer' }}
         >
           + Add Project
         </button>
@@ -560,6 +505,25 @@ function ServicesTab({ data, onRefetch }: any) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(service),
     });
+    await fetch('/api/revalidate', { method: 'POST' });
+    onRefetch();
+  };
+
+  const add = async () => {
+    const res = await fetch('/api/services', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({}),
+    });
+    const service = await res.json();
+    setServices([...services, service]);
+    await fetch('/api/revalidate', { method: 'POST' });
+  };
+
+  const remove = async (id: string) => {
+    await fetch(`/api/services/${id}`, { method: 'DELETE' });
+    setServices(services.filter((s: any) => s.id !== id));
+    await fetch('/api/revalidate', { method: 'POST' });
     onRefetch();
   };
 
@@ -568,46 +532,23 @@ function ServicesTab({ data, onRefetch }: any) {
       <AdminLabel>Services</AdminLabel>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {services.map((service: any, i: number) => (
-          <div key={service.id} style={{
-            background: '#111',
-            border: '1px solid #1a1a1a',
-            borderRadius: '2px',
-            padding: '1.2rem',
-          }}>
+          <div key={service.id} style={{ background: '#111', border: '1px solid #1a1a1a', borderRadius: '2px', padding: '1.2rem' }}>
             <AdminGrid>
-              <AdminField
-                label="Number"
-                value={service.num}
-                onChange={v => {
-                  const arr = [...services];
-                  arr[i] = { ...arr[i], num: v };
-                  setServices(arr);
-                }}
-              />
-              <AdminField
-                label="Title"
-                value={service.title}
-                onChange={v => {
-                  const arr = [...services];
-                  arr[i] = { ...arr[i], title: v };
-                  setServices(arr);
-                }}
-              />
-              <AdminField
-                label="Description"
-                value={service.desc}
-                onChange={v => {
-                  const arr = [...services];
-                  arr[i] = { ...arr[i], desc: v };
-                  setServices(arr);
-                }}
-                textarea
-                fullWidth
-              />
+              <AdminField label="Number" value={service.num} onChange={v => { const arr = [...services]; arr[i] = { ...arr[i], num: v }; setServices(arr); }} />
+              <AdminField label="Title" value={service.title} onChange={v => { const arr = [...services]; arr[i] = { ...arr[i], title: v }; setServices(arr); }} />
+              <AdminField label="Description" value={service.desc} onChange={v => { const arr = [...services]; arr[i] = { ...arr[i], desc: v }; setServices(arr); }} textarea fullWidth />
             </AdminGrid>
-            <SaveButton onSave={() => save(services[i])} label="Save Service" />
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <SaveButton onSave={() => save(services[i])} label="Save Service" />
+              <button onClick={() => remove(service.id)} style={{ padding: '0.6rem 1rem', background: 'transparent', border: '1px solid #333', color: '#666', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', borderRadius: '1px', cursor: 'pointer' }}>Remove</button>
+            </div>
           </div>
         ))}
+      </div>
+      <div style={{ marginTop: '1rem' }}>
+        <button onClick={add} style={{ padding: '0.8rem', width: '100%', background: 'transparent', border: '1px dashed #333', color: '#666', fontFamily: "'Space Mono', monospace", fontSize: '0.75rem', borderRadius: '1px', cursor: 'pointer' }}>
+          + Add Service
+        </button>
       </div>
     </div>
   );
@@ -617,12 +558,20 @@ function ServicesTab({ data, onRefetch }: any) {
 function TimelineTab({ data, onRefetch }: any) {
   const [timeline, setTimeline] = useState(data.timeline || []);
 
-  const save = async (item: any) => {
+  const saveItem = async (item: any) => {
     await fetch(`/api/timeline/${item.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(item),
+      body: JSON.stringify({
+        type: item.type,
+        title: item.title,
+        organisation: item.organisation,
+        period: item.period,
+        desc: item.desc,
+        order: item.order,
+      }),
     });
+    await fetch('/api/revalidate', { method: 'POST' });
     onRefetch();
   };
 
@@ -645,7 +594,8 @@ function TimelineTab({ data, onRefetch }: any) {
 
   const remove = async (id: string) => {
     await fetch(`/api/timeline/${id}`, { method: 'DELETE' });
-    setTimeline(timeline.filter((t: any) => t.id !== id));
+    setTimeline((prev: any[]) => prev.filter(t => t.id !== id));
+    await fetch('/api/revalidate', { method: 'POST' });
   };
 
   return (
@@ -653,20 +603,27 @@ function TimelineTab({ data, onRefetch }: any) {
       <AdminLabel>Timeline</AdminLabel>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
         {timeline.map((item: any, i: number) => (
-          <div key={item.id} style={{
-            background: '#111',
-            border: '1px solid #1a1a1a',
-            borderRadius: '2px',
-            padding: '1.2rem',
-          }}>
+          <div key={item.id} style={{ background: '#111', border: '1px solid #1a1a1a', borderRadius: '2px', padding: '1.2rem' }}>
             <AdminGrid>
-              <AdminField label="Title" value={item.title} onChange={v => { const arr = [...timeline]; arr[i] = { ...arr[i], title: v }; setTimeline(arr); }} />
-              <AdminField label="Organisation" value={item.organisation} onChange={v => { const arr = [...timeline]; arr[i] = { ...arr[i], organisation: v }; setTimeline(arr); }} />
-              <AdminField label="Period" value={item.period} onChange={v => { const arr = [...timeline]; arr[i] = { ...arr[i], period: v }; setTimeline(arr); }} />
+              <AdminField
+                label="Title"
+                value={item.title || ''}
+                onChange={v => { const arr = [...timeline]; arr[i] = { ...arr[i], title: v }; setTimeline(arr); }}
+              />
+              <AdminField
+                label="Organisation"
+                value={item.organisation || ''}
+                onChange={v => { const arr = [...timeline]; arr[i] = { ...arr[i], organisation: v }; setTimeline(arr); }}
+              />
+              <AdminField
+                label="Period"
+                value={item.period || ''}
+                onChange={v => { const arr = [...timeline]; arr[i] = { ...arr[i], period: v }; setTimeline(arr); }}
+              />
               <div>
                 <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Type</div>
                 <select
-                  value={item.type}
+                  value={item.type || 'work'}
                   onChange={e => { const arr = [...timeline]; arr[i] = { ...arr[i], type: e.target.value }; setTimeline(arr); }}
                   style={{ width: '100%', background: '#0a0a0a', border: '1px solid #222', color: '#f0ede8', padding: '0.6rem', fontFamily: "'Syne', sans-serif", fontSize: '0.85rem', borderRadius: '1px', outline: 'none' }}
                 >
@@ -674,17 +631,33 @@ function TimelineTab({ data, onRefetch }: any) {
                   <option value="education">Education</option>
                 </select>
               </div>
-              <AdminField label="Description" value={item.desc} onChange={v => { const arr = [...timeline]; arr[i] = { ...arr[i], desc: v }; setTimeline(arr); }} textarea fullWidth />
+              <AdminField
+                label="Description"
+                value={item.desc || ''}
+                onChange={v => { const arr = [...timeline]; arr[i] = { ...arr[i], desc: v }; setTimeline(arr); }}
+                textarea
+                fullWidth
+              />
             </AdminGrid>
             <div style={{ display: 'flex', gap: '1rem' }}>
-              <SaveButton onSave={() => save(timeline[i])} label="Save" />
-              <button onClick={() => remove(item.id)} style={{ padding: '0.6rem 1rem', background: 'transparent', border: '1px solid #333', color: '#666', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', borderRadius: '1px', cursor: 'pointer' }}>Remove</button>
+              <SaveButton onSave={() => saveItem(timeline[i])} label="Save" />
+              <button
+                onClick={() => remove(item.id)}
+                style={{ padding: '0.6rem 1rem', background: 'transparent', border: '1px solid #333', color: '#666', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', borderRadius: '1px', cursor: 'pointer' }}
+              >
+                Remove
+              </button>
             </div>
           </div>
         ))}
       </div>
       <div style={{ marginTop: '1rem' }}>
-        <button onClick={add} style={{ padding: '0.8rem', width: '100%', background: 'transparent', border: '1px dashed #333', color: '#666', fontFamily: "'Space Mono', monospace", fontSize: '0.75rem', borderRadius: '1px', cursor: 'pointer' }}>+ Add Entry</button>
+        <button
+          onClick={add}
+          style={{ padding: '0.8rem', width: '100%', background: 'transparent', border: '1px dashed #333', color: '#666', fontFamily: "'Space Mono', monospace", fontSize: '0.75rem', borderRadius: '1px', cursor: 'pointer' }}
+        >
+          + Add Entry
+        </button>
       </div>
     </div>
   );
@@ -707,8 +680,11 @@ function TestimonialsTab({ data, onRefetch }: any) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: 'APPROVED' }),
     });
+    await fetch('/api/revalidate', { method: 'POST' });
+    const item = pending.find(p => p.id === id);
+    if (item) setApproved((prev: any[]) => [...prev, { ...item, status: 'APPROVED' }]);
+    setPending((prev: any[]) => prev.filter(p => p.id !== id));
     onRefetch();
-    setPending(pending.filter(p => p.id !== id));
   };
 
   const reject = async (id: string) => {
@@ -717,12 +693,13 @@ function TestimonialsTab({ data, onRefetch }: any) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status: 'REJECTED' }),
     });
-    setPending(pending.filter(p => p.id !== id));
+    setPending((prev: any[]) => prev.filter(p => p.id !== id));
   };
 
   const remove = async (id: string) => {
     await fetch(`/api/testimonials/${id}`, { method: 'DELETE' });
-    setApproved(approved.filter((t: any) => t.id !== id));
+    setApproved((prev: any[]) => prev.filter((t: any) => t.id !== id));
+    await fetch('/api/revalidate', { method: 'POST' });
   };
 
   return (
@@ -734,9 +711,13 @@ function TestimonialsTab({ data, onRefetch }: any) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {pending.map(t => (
             <div key={t.id} style={{ background: '#111', border: '1px solid hsl(348,40%,20%)', borderRadius: '2px', padding: '1.2rem' }}>
-              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: 'hsl(348,100%,55%)', marginBottom: '0.6rem' }}>NEW — {new Date(t.createdAt).toLocaleDateString()}</div>
+              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: 'hsl(348,100%,55%)', marginBottom: '0.6rem' }}>
+                NEW — {new Date(t.createdAt).toLocaleDateString()}
+              </div>
               <p style={{ fontStyle: 'italic', color: '#aaa', fontSize: '0.9rem', marginBottom: '0.8rem' }}>"{t.quote}"</p>
-              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.75rem', color: '#888', marginBottom: '1rem' }}>— {t.author}{t.role ? ', ' + t.role : ''}</div>
+              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.75rem', color: '#888', marginBottom: '1rem' }}>
+                — {t.author}{t.role ? ', ' + t.role : ''}
+              </div>
               <div style={{ display: 'flex', gap: '0.8rem' }}>
                 <button onClick={() => approve(t.id)} style={{ padding: '0.5rem 1rem', background: 'hsl(348,100%,40%)', color: '#fff', border: 'none', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', borderRadius: '1px', cursor: 'pointer' }}>✓ Approve</button>
                 <button onClick={() => reject(t.id)} style={{ padding: '0.5rem 1rem', background: 'transparent', border: '1px solid #333', color: '#666', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', borderRadius: '1px', cursor: 'pointer' }}>✕ Reject</button>
@@ -772,6 +753,7 @@ function ContactTab({ data, onRefetch }: any) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
     });
+     await fetch('/api/revalidate', { method: 'POST' });
     onRefetch();
   };
 
@@ -798,10 +780,15 @@ function MessagesTab({ onRefetch }: any) {
   const [messages, setMessages] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const loadMessages = async () => {
+    const res = await fetch('/api/contact');
+    const data = await res.json();
+    setMessages(data);
+    setLoading(false);
+  };
+
   useEffect(() => {
-    fetch('/api/contact')
-      .then(r => r.json())
-      .then(data => { setMessages(data); setLoading(false); });
+    loadMessages();
   }, []);
 
   const markRead = async (id: string) => {
@@ -810,13 +797,13 @@ function MessagesTab({ onRefetch }: any) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ read: true }),
     });
-    setMessages(messages.map(m => m.id === id ? { ...m, read: true } : m));
+    setMessages((prev: any[]) => prev.map(m => m.id === id ? { ...m, read: true } : m));
     onRefetch();
   };
 
   const deleteMsg = async (id: string) => {
     await fetch(`/api/contact/${id}`, { method: 'DELETE' });
-    setMessages(messages.filter(m => m.id !== id));
+    setMessages((prev: any[]) => prev.filter(m => m.id !== id));
     onRefetch();
   };
 
@@ -833,25 +820,33 @@ function MessagesTab({ onRefetch }: any) {
             <div key={msg.id} style={{
               background: msg.read ? '#111' : '#0f0f0f',
               border: '1px solid ' + (msg.read ? '#1a1a1a' : 'hsl(348,40%,20%)'),
-              borderRadius: '2px',
-              padding: '1.2rem',
-              position: 'relative',
+              borderRadius: '2px', padding: '1.2rem', position: 'relative',
             }}>
               {!msg.read && (
                 <div style={{ position: 'absolute', top: '1rem', right: '1rem', width: '8px', height: '8px', borderRadius: '50%', background: 'hsl(348,100%,55%)' }} />
               )}
               <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: '#555', marginBottom: '0.5rem' }}>
                 {new Date(msg.createdAt).toLocaleDateString()} {new Date(msg.createdAt).toLocaleTimeString()}
+                {msg.read && <span style={{ marginLeft: '0.8rem', color: '#4caf50' }}>✓ Read</span>}
               </div>
-              <div style={{ fontWeight: 700, marginBottom: '0.2rem' }}>{msg.name}</div>
+              <div style={{ fontWeight: 700, marginBottom: '0.2rem', color: '#f0ede8' }}>{msg.name}</div>
               <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', color: 'hsl(348,100%,55%)', marginBottom: '0.8rem' }}>{msg.email}</div>
               <p style={{ fontSize: '0.88rem', color: '#aaa', lineHeight: 1.6, marginBottom: '1rem' }}>{msg.message}</p>
-              <div style={{ display: 'flex', gap: '0.8rem' }}>
+              <div style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap' }}>
                 {!msg.read && (
-                  <button onClick={() => markRead(msg.id)} style={{ padding: '0.4rem 0.8rem', background: 'transparent', border: '1px solid hsl(348,40%,30%)', color: 'hsl(348,100%,55%)', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', borderRadius: '1px', cursor: 'pointer' }}>✓ Mark Read</button>
+                  <button onClick={() => markRead(msg.id)} style={{ padding: '0.4rem 0.8rem', background: 'transparent', border: '1px solid hsl(348,40%,30%)', color: 'hsl(348,100%,55%)', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', borderRadius: '1px', cursor: 'pointer' }}>
+                    ✓ Mark Read
+                  </button>
                 )}
-                <a href={'mailto:' + msg.email} style={{ padding: '0.4rem 0.8rem', background: 'hsl(348,100%,40%)', color: '#fff', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', borderRadius: '1px', textDecoration: 'none' }}>Reply</a>
-                <button onClick={() => deleteMsg(msg.id)} style={{ padding: '0.4rem 0.8rem', background: 'transparent', border: '1px solid #333', color: '#666', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', borderRadius: '1px', cursor: 'pointer' }}>Delete</button>
+                <a
+                  href={`mailto:${msg.email}?subject=Re: Your message&body=Hi ${msg.name},%0D%0A%0D%0AThank you for reaching out.%0D%0A%0D%0A----%0D%0AOriginal message:%0D%0A${encodeURIComponent(msg.message)}`}
+                  style={{ padding: '0.4rem 0.8rem', background: 'hsl(348,100%,40%)', color: '#fff', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', borderRadius: '1px', textDecoration: 'none', display: 'inline-block' }}
+                >
+                  Reply via Email
+                </a>
+                <button onClick={() => deleteMsg(msg.id)} style={{ padding: '0.4rem 0.8rem', background: 'transparent', border: '1px solid #333', color: '#666', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', borderRadius: '1px', cursor: 'pointer' }}>
+                  Delete
+                </button>
               </div>
             </div>
           ))}
@@ -871,6 +866,7 @@ function SEOTab({ data, onRefetch }: any) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
     });
+     await fetch('/api/revalidate', { method: 'POST' });
     onRefetch();
   };
 
@@ -902,36 +898,54 @@ function BrandingTab({ data, onRefetch }: any) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
     });
+    await fetch('/api/revalidate', { method: 'POST' });
     onRefetch();
   };
 
   return (
-    <div>
-      <AdminLabel>Logo</AdminLabel>
+  <div>
+   <AdminLabel>Logo</AdminLabel>
       <AdminGrid>
-        <AdminField label="Logo Text" value={form.logoText} onChange={v => setForm({ ...form, logoText: v })} />
-        <AdminField label="Logo Image URL" value={form.logoUrl} onChange={v => setForm({ ...form, logoUrl: v })} />
+        <AdminField label="Logo Text (shown if no image)" value={form.logoText} onChange={v => setForm({ ...form, logoText: v })} />
       </AdminGrid>
 
-      <AdminLabel>Display Font</AdminLabel>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: '0.8rem', marginBottom: '1.5rem' }}>
-        {fonts.map(font => (
-          <div
-            key={font}
-            onClick={() => setForm({ ...form, displayFont: font })}
-            style={{
-              background: form.displayFont === font ? 'rgba(220,30,60,0.15)' : '#111',
-              border: '1px solid ' + (form.displayFont === font ? 'hsl(348,100%,55%)' : '#1a1a1a'),
-              borderRadius: '2px',
-              padding: '0.8rem 1rem',
-              cursor: 'pointer',
-              transition: 'all 0.2s',
-            }}
-          >
-            <div style={{ fontFamily: `'${font}', sans-serif`, fontSize: '1rem', marginBottom: '0.3rem' }}>Aa Bb Cc</div>
-            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.65rem', color: '#666' }}>{font}</div>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.8rem' }}>
+          Logo Image (drag & drop any image format)
+        </div>
+        {form.logoUrl && (
+          <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <img src={form.logoUrl} alt="Logo" style={{ height: '60px', width: 'auto', objectFit: 'contain', background: '#1a1a1a', padding: '0.5rem', borderRadius: '2px' }} />
+            <button
+              onClick={() => setForm({ ...form, logoUrl: '' })}
+              style={{ padding: '0.4rem 0.8rem', background: 'transparent', border: '1px solid #333', color: '#666', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', borderRadius: '1px', cursor: 'pointer' }}
+            >
+              Remove Logo
+            </button>
           </div>
-        ))}
+        )}
+        <FileUpload
+          folder="logos"
+          accept="image/*,.svg,.ico,.webp,.png,.jpg,.jpeg,.gif"
+          label="Drop your logo here — any image format"
+          onUpload={url => setForm({ ...form, logoUrl: url })}
+        />
+      </div>
+
+     <AdminLabel>Browser Tab Icon (Favicon)</AdminLabel>
+      <div style={{ marginBottom: '1.5rem' }}>
+        <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', color: '#666', marginBottom: '1rem', lineHeight: 1.6 }}>
+          Upload a square image (PNG recommended, 32x32 or 64x64px). After uploading, copy the URL and add it to your public folder as favicon.ico or update your layout.tsx link tag.
+        </p>
+        <FileUpload
+          folder="favicon"
+          accept="image/*,.ico"
+          label="Upload Favicon / Tab Icon"
+          onUpload={async url => {
+            navigator.clipboard?.writeText(url);
+            alert('Favicon uploaded! URL copied to clipboard: ' + url + '\n\nAdd this to your layout.tsx <head> as: <link rel="icon" href="' + url + '" />');
+          }}
+        />
       </div>
 
       <AdminLabel>Mono Font</AdminLabel>
@@ -957,6 +971,7 @@ function BrandingTab({ data, onRefetch }: any) {
 
       <SaveButton onSave={save} />
     </div>
+
   );
 }
 
@@ -972,6 +987,7 @@ function ResumeTab({ data, onRefetch }: any) {
       body: JSON.stringify({ enabled: !resume.enabled }),
     });
     setResume({ ...resume, enabled: !resume.enabled });
+    await fetch('/api/revalidate', { method: 'POST' });
     onRefetch();
   };
 
@@ -987,7 +1003,7 @@ function ResumeTab({ data, onRefetch }: any) {
       }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.2rem' }}>
           <div>
-            <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: '0.3rem' }}>
+            <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, marginBottom: '0.3rem', color: 'hsl(348,100%,40%)' }}>
               Resume Download
             </div>
             <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', color: '#666' }}>
