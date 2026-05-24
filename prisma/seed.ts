@@ -261,6 +261,23 @@ async function main() {
   });
   console.log('Seeded resume');
 
+  await prisma.themeSettings.deleteMany();
+  await prisma.themeSettings.create({
+    data: {
+      primaryColor: 'hsl(348, 100%, 40%)',
+      primaryLight: 'hsl(348, 100%, 55%)',
+      primaryDim: 'hsl(348, 60%, 25%)',
+      bgDark: '#0a0a0a',
+      bgDark2: '#111111',
+      bgDark3: '#1a1a1a',
+      bgDark4: '#222222',
+      textLight: '#f0ede8',
+      displayFont: 'Syne',
+      monoFont: 'Space Mono',
+    },
+  });
+  console.log('Seeded theme');
+
   console.log('✓ Database seeded successfully!');
 
   await prisma.$disconnect();

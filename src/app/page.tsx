@@ -50,12 +50,20 @@ export default async function Home() {
     <>
       <style>{`
         :root {
-          --font-display: '${fontFamily}', sans-serif;
-          --font-mono: '${monoFont}', monospace;
+          --cr: ${data.theme?.primaryColor || 'hsl(348, 100%, 40%)'};
+          --cr-light: ${data.theme?.primaryLight || 'hsl(348, 100%, 55%)'};
+          --cr-dim: ${data.theme?.primaryDim || 'hsl(348, 60%, 25%)'};
+          --dark: ${data.theme?.bgDark || '#0a0a0a'};
+          --dark2: ${data.theme?.bgDark2 || '#111111'};
+          --dark3: ${data.theme?.bgDark3 || '#1a1a1a'};
+          --dark4: ${data.theme?.bgDark4 || '#222222'};
+          --light: ${data.theme?.textLight || '#f0ede8'};
+          --font-display: '${data.theme?.displayFont || data.branding?.displayFont || 'Syne'}', sans-serif;
+          --font-mono: '${data.theme?.monoFont || data.branding?.monoFont || 'Space Mono'}', monospace;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         html { scroll-behavior: smooth; }
-        body { background: #0a0a0a; color: #f0ede8; font-family: var(--font-display); overflow-x: hidden; }
+        body { background: var(--dark); color: var(--light); font-family: var(--font-display); overflow-x: hidden; }
         a { color: inherit; text-decoration: none; }
         button { cursor: pointer; font-family: var(--font-display); }
         img { max-width: 100%; display: block; }
@@ -64,8 +72,9 @@ export default async function Home() {
           50% { opacity: 1; transform: scaleY(1.1); }
         }
         ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: #111; }
-        ::-webkit-scrollbar-thumb { background: hsl(348,60%,25%); border-radius: 2px; }
+        ::-webkit-scrollbar-track { background: var(--dark2); }
+        ::-webkit-scrollbar-thumb { background: var(--cr-dim); border-radius: 2px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--cr); }
       `}</style>
 
       <Navbar sections={data.sections} branding={data.branding} />

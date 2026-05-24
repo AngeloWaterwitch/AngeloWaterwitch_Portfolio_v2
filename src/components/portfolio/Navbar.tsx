@@ -1,12 +1,12 @@
 'use client';
-
+ 
 import { useState, useEffect } from 'react';
-
+ 
 export default function Navbar({ sections, branding }: any) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-
+ 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -18,23 +18,21 @@ export default function Navbar({ sections, branding }: any) {
       window.removeEventListener('resize', handleResize);
     };
   }, []);
-
+ 
   const visibleSections = sections?.filter((s: any) => s.visible) || [];
-
+ 
   const getBarTransform = (index: number) => {
     if (!menuOpen) return 'none';
     if (index === 0) return 'rotate(45deg) translate(5px, 5px)';
     if (index === 2) return 'rotate(-45deg) translate(5px, -5px)';
     return 'none';
   };
-
+ 
   return (
     <>
       <nav style={{
         position: 'fixed',
-        top: 0,
-        left: 0,
-        right: 0,
+        top: 0, left: 0, right: 0,
         zIndex: 900,
         display: 'flex',
         alignItems: 'center',
@@ -42,34 +40,24 @@ export default function Navbar({ sections, branding }: any) {
         padding: isMobile ? '1rem 1.5rem' : '1.2rem 3rem',
         background: scrolled ? 'rgba(10,10,10,0.98)' : 'rgba(10,10,10,0.85)',
         backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid rgba(220,30,60,0.15)',
+        borderBottom: '1px solid color-mix(in srgb, var(--cr-primary) 15%, transparent)',
         transition: 'background 0.3s ease',
       }}>
         <a href="#home" style={{
           fontFamily: 'var(--font-display)',
           fontSize: '1.1rem',
           fontWeight: 800,
-          color: 'hsl(348,100%,55%)',
+          color: 'var(--cr-light)',
           letterSpacing: '0.08em',
           textDecoration: 'none',
         }}>
           {branding?.logoUrl ? (
-          <img
-            src={branding.logoUrl}
-            alt="Logo"
-            style={{
-              height: '40px',
-              width: 'auto',
-              maxWidth: '120px',
-              objectFit: 'contain',
-              objectPosition: 'left center',
-            }}
-          />
-        ) : (
-          branding?.logoText || 'AW.'
-        )}
+            <img src={branding.logoUrl} alt="Logo" style={{ height: '40px', width: 'auto', maxWidth: '120px', objectFit: 'contain', objectPosition: 'left center' }} />
+          ) : (
+            branding?.logoText || 'AW.'
+          )}
         </a>
-
+ 
         {!isMobile && (
           <>
             <ul style={{ display: 'flex', gap: '2.5rem', listStyle: 'none', margin: 0, padding: 0 }}>
@@ -86,7 +74,7 @@ export default function Navbar({ sections, branding }: any) {
                       textDecoration: 'none',
                       transition: 'color 0.2s',
                     }}
-                    onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.color = 'hsl(348,100%,55%)'; }}
+                    onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.color = 'var(--cr-light)'; }}
                     onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.color = '#aaa'; }}
                   >
                     {s.label}
@@ -94,37 +82,37 @@ export default function Navbar({ sections, branding }: any) {
                 </li>
               ))}
             </ul>
-
+ 
             <a
               href="/admin"
               style={{
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.72rem',
                 padding: '0.4rem 1rem',
-                border: '1px solid hsl(348,60%,25%)',
+                border: '1px solid var(--cr-dim)',
                 borderRadius: '2px',
-                color: 'hsl(348,100%,55%)',
+                color: 'var(--cr-light)',
                 letterSpacing: '0.1em',
                 textTransform: 'uppercase',
                 transition: 'all 0.2s',
                 textDecoration: 'none',
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.background = 'hsl(348,100%,40%)';
+                e.currentTarget.style.background = 'var(--cr-primary)';
                 e.currentTarget.style.color = '#fff';
-                e.currentTarget.style.borderColor = 'hsl(348,100%,40%)';
+                e.currentTarget.style.borderColor = 'var(--cr-primary)';
               }}
               onMouseLeave={e => {
                 e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = 'hsl(348,100%,55%)';
-                e.currentTarget.style.borderColor = 'hsl(348,60%,25%)';
+                e.currentTarget.style.color = 'var(--cr-light)';
+                e.currentTarget.style.borderColor = 'var(--cr-dim)';
               }}
             >
               Admin
             </a>
           </>
         )}
-
+ 
         {isMobile && (
           <button
             onClick={() => setMenuOpen(!menuOpen)}
@@ -141,7 +129,7 @@ export default function Navbar({ sections, branding }: any) {
           </button>
         )}
       </nav>
-
+ 
       {isMobile && menuOpen && (
         <div style={{
           position: 'fixed', inset: 0, zIndex: 899,
@@ -157,7 +145,7 @@ export default function Navbar({ sections, branding }: any) {
               style={{
                 fontFamily: 'var(--font-display)',
                 fontSize: '2rem', fontWeight: 800,
-                color: '#f0ede8', textDecoration: 'none',
+                color: 'var(--cr-text)', textDecoration: 'none',
               }}
             >
               {s.label}
@@ -169,21 +157,21 @@ export default function Navbar({ sections, branding }: any) {
               fontFamily: 'var(--font-mono)',
               fontSize: '0.72rem',
               padding: '0.4rem 1rem',
-              border: '1px solid hsl(348,60%,25%)',
+              border: '1px solid var(--cr-dim)',
               borderRadius: '2px',
-              color: 'hsl(348,100%,55%)',
+              color: 'var(--cr-light)',
               letterSpacing: '0.1em',
               textTransform: 'uppercase',
               transition: 'all 0.2s',
               textDecoration: 'none',
             }}
             onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
-              e.currentTarget.style.background = 'hsl(348,100%,40%)';
+              e.currentTarget.style.background = 'var(--cr-primary)';
               e.currentTarget.style.color = '#fff';
             }}
             onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
               e.currentTarget.style.background = 'transparent';
-              e.currentTarget.style.color = 'hsl(348,100%,55%)';
+              e.currentTarget.style.color = 'var(--cr-light)';
             }}
           >
             Admin

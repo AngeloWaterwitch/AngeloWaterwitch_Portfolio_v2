@@ -59,6 +59,7 @@ export default function AdminPage() {
     { id: 'messages', label: unreadCount > 0 ? `Messages (${unreadCount})` : 'Messages' },
     { id: 'seo', label: 'SEO' },
     { id: 'branding', label: 'Branding' },
+    { id: 'theme', label: 'Theme' },
     { id: 'resume', label: 'Resume' },
   ];
 
@@ -87,15 +88,11 @@ export default function AdminPage() {
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <a
-        href="/"
+            href="/"
             target="_blank"
             rel="noreferrer noopener"
-            onMouseEnter={e => {
-              e.currentTarget.style.color = 'hsl(348,100%,55%)';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.color = '#aaa';
-            }}
+            onMouseEnter={e => { e.currentTarget.style.color = 'hsl(348,100%,55%)'; }}
+            onMouseLeave={e => { e.currentTarget.style.color = '#aaa'; }}
             style={{
               fontFamily: "'Space Mono', monospace",
               fontSize: '0.7rem',
@@ -109,14 +106,8 @@ export default function AdminPage() {
           </a>
           <button
             onClick={() => signOut({ callbackUrl: '/admin/login' })}
-            onMouseEnter={e => {
-              e.currentTarget.style.borderColor = 'hsl(348,100%,55%)';
-              e.currentTarget.style.color = 'hsl(348,100%,55%)';
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.borderColor = '#555';
-              e.currentTarget.style.color = '#ccc';
-            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'hsl(348,100%,55%)'; e.currentTarget.style.color = 'hsl(348,100%,55%)'; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = '#555'; e.currentTarget.style.color = '#ccc'; }}
             style={{
               padding: '0.4rem 1rem',
               background: 'transparent',
@@ -150,42 +141,42 @@ export default function AdminPage() {
           height: 'calc(100vh - 60px)',
           overflowY: 'auto',
         }}>
-{tabs.map(tab => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                onMouseEnter={e => {
-                  if (activeTab !== tab.id) {
-                    e.currentTarget.style.color = '#f0ede8';
-                    e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
-                  }
-                }}
-                onMouseLeave={e => {
-                  if (activeTab !== tab.id) {
-                    e.currentTarget.style.color = '#bbb';
-                    e.currentTarget.style.background = 'transparent';
-                  }
-                }}
-                style={{
-                  display: 'block',
-                  width: '100%',
-                  padding: '0.7rem 1.5rem',
-                  background: activeTab === tab.id ? 'rgba(220,30,60,0.15)' : 'transparent',
-                  border: 'none',
-                  borderLeft: activeTab === tab.id ? '3px solid hsl(348,100%,55%)' : '3px solid transparent',
-                  color: activeTab === tab.id ? 'hsl(348,100%,55%)' : '#bbb',
-                  fontFamily: "'Space Mono', monospace",
-                  fontSize: '0.72rem',
-                  letterSpacing: '0.08em',
-                  textAlign: 'left',
-                  cursor: 'pointer',
-                  transition: 'all 0.15s',
-                  textTransform: 'uppercase',
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              onMouseEnter={e => {
+                if (activeTab !== tab.id) {
+                  e.currentTarget.style.color = '#f0ede8';
+                  e.currentTarget.style.background = 'rgba(255,255,255,0.03)';
+                }
+              }}
+              onMouseLeave={e => {
+                if (activeTab !== tab.id) {
+                  e.currentTarget.style.color = '#bbb';
+                  e.currentTarget.style.background = 'transparent';
+                }
+              }}
+              style={{
+                display: 'block',
+                width: '100%',
+                padding: '0.7rem 1.5rem',
+                background: activeTab === tab.id ? 'rgba(220,30,60,0.15)' : 'transparent',
+                border: 'none',
+                borderLeft: activeTab === tab.id ? '3px solid hsl(348,100%,55%)' : '3px solid transparent',
+                color: activeTab === tab.id ? 'hsl(348,100%,55%)' : '#bbb',
+                fontFamily: "'Space Mono', monospace",
+                fontSize: '0.72rem',
+                letterSpacing: '0.08em',
+                textAlign: 'left',
+                cursor: 'pointer',
+                transition: 'all 0.15s',
+                textTransform: 'uppercase',
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
 
         {/* Main content */}
@@ -201,6 +192,7 @@ export default function AdminPage() {
           {activeTab === 'messages' && <MessagesTab onRefetch={fetchData} />}
           {activeTab === 'seo' && <SEOTab data={data} onRefetch={fetchData} />}
           {activeTab === 'branding' && <BrandingTab data={data} onRefetch={fetchData} />}
+          {activeTab === 'theme' && <ThemeTab data={data} onRefetch={fetchData} />}
           {activeTab === 'resume' && <ResumeTab data={data} onRefetch={fetchData} />}
         </div>
       </div>
@@ -753,7 +745,7 @@ function ContactTab({ data, onRefetch }: any) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
     });
-     await fetch('/api/revalidate', { method: 'POST' });
+    await fetch('/api/revalidate', { method: 'POST' });
     onRefetch();
   };
 
@@ -866,7 +858,7 @@ function SEOTab({ data, onRefetch }: any) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
     });
-     await fetch('/api/revalidate', { method: 'POST' });
+    await fetch('/api/revalidate', { method: 'POST' });
     onRefetch();
   };
 
@@ -889,7 +881,6 @@ function SEOTab({ data, onRefetch }: any) {
 function BrandingTab({ data, onRefetch }: any) {
   const [form, setForm] = useState(data.branding || {});
 
-  const fonts = ['Syne', 'Inter', 'Playfair Display', 'Raleway', 'Oswald'];
   const monoFonts = ['Space Mono', 'Fira Code', 'JetBrains Mono'];
 
   const save = async () => {
@@ -903,8 +894,8 @@ function BrandingTab({ data, onRefetch }: any) {
   };
 
   return (
-  <div>
-   <AdminLabel>Logo</AdminLabel>
+    <div>
+      <AdminLabel>Logo</AdminLabel>
       <AdminGrid>
         <AdminField label="Logo Text (shown if no image)" value={form.logoText} onChange={v => setForm({ ...form, logoText: v })} />
       </AdminGrid>
@@ -932,20 +923,36 @@ function BrandingTab({ data, onRefetch }: any) {
         />
       </div>
 
-     <AdminLabel>Browser Tab Icon (Favicon)</AdminLabel>
+      <AdminLabel>Browser Tab Icon (Favicon)</AdminLabel>
       <div style={{ marginBottom: '1.5rem' }}>
-        <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', color: '#666', marginBottom: '1rem', lineHeight: 1.6 }}>
-          Upload a square image (PNG recommended, 32x32 or 64x64px). After uploading, copy the URL and add it to your public folder as favicon.ico or update your layout.tsx link tag.
-        </p>
+        <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+          Square PNG recommended — 32x32 or 64x64px
+        </div>
+        {form.faviconUrl && (
+          <div style={{ marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <img src={form.faviconUrl} alt="Favicon" style={{ height: '32px', width: '32px', objectFit: 'contain', background: '#1a1a1a', padding: '4px', borderRadius: '2px' }} />
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', color: '#666' }}>
+              Current favicon
+            </span>
+            <button
+              onClick={() => setForm({ ...form, faviconUrl: '' })}
+              style={{ padding: '0.4rem 0.8rem', background: 'transparent', border: '1px solid #333', color: '#666', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', borderRadius: '1px', cursor: 'pointer' }}
+            >
+              Remove
+            </button>
+          </div>
+        )}
         <FileUpload
           folder="favicon"
           accept="image/*,.ico"
           label="Upload Favicon / Tab Icon"
           onUpload={async url => {
-            navigator.clipboard?.writeText(url);
-            alert('Favicon uploaded! URL copied to clipboard: ' + url + '\n\nAdd this to your layout.tsx <head> as: <link rel="icon" href="' + url + '" />');
+            setForm((prev: any) => ({ ...prev, faviconUrl: url }));
           }}
         />
+        <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.65rem', color: '#555', marginTop: '0.5rem' }}>
+          Click Save below to apply the favicon site-wide.
+        </div>
       </div>
 
       <AdminLabel>Mono Font</AdminLabel>
@@ -971,16 +978,45 @@ function BrandingTab({ data, onRefetch }: any) {
 
       <SaveButton onSave={save} />
     </div>
-
   );
 }
 
 // ─── RESUME TAB ─────────────────────────────────────────────
 function ResumeTab({ data, onRefetch }: any) {
   const [resume, setResume] = useState(data.resume || {});
-  const [uploading, setUploading] = useState(false);
+  const [requests, setRequests] = useState<any[]>([]);
+  const [loadingRequests, setLoadingRequests] = useState(true);
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchRequests();
+  }, []);
+
+  const fetchRequests = async () => {
+    setLoadingRequests(true);
+    try {
+      const res = await fetch('/api/resume/request');
+      const data = await res.json();
+      setRequests(data);
+    } catch {
+      setRequests([]);
+    } finally {
+      setLoadingRequests(false);
+    }
+  };
+
+  const handleAction = async (token: string, action: 'approve' | 'deny') => {
+    setActionLoading(token + action);
+    try {
+      await fetch(`/api/resume/request/${action}?token=${token}`);
+      await fetchRequests();
+    } finally {
+      setActionLoading(null);
+    }
+  };
 
   const toggleEnabled = async () => {
+    if (!resume?.id) return;
     await fetch(`/api/resume/${resume.id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
@@ -991,9 +1027,20 @@ function ResumeTab({ data, onRefetch }: any) {
     onRefetch();
   };
 
+  const pendingRequests = requests.filter((r: any) => r.status === 'PENDING');
+  const pastRequests = requests.filter((r: any) => r.status !== 'PENDING');
+
+  const statusColor: Record<string, string> = {
+    PENDING: '#f59e0b',
+    APPROVED: '#22c55e',
+    DENIED: '#ef4444',
+  };
+
   return (
     <div>
       <AdminLabel>Resume / CV</AdminLabel>
+
+      {/* ── File & Toggle ── */}
       <div style={{
         background: '#111',
         border: '1px solid #1a1a1a',
@@ -1007,28 +1054,33 @@ function ResumeTab({ data, onRefetch }: any) {
               Resume Download
             </div>
             <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', color: '#666' }}>
-              {resume.enabled ? 'Visible to visitors' : 'Hidden from visitors'}
+              {!resume?.id
+                ? 'No resume uploaded yet'
+                : resume.enabled
+                ? 'Visible to visitors'
+                : 'Hidden from visitors'}
             </div>
           </div>
           <button
             onClick={toggleEnabled}
+            disabled={!resume?.id}
             style={{
               padding: '0.5rem 1.2rem',
-              background: resume.enabled ? 'hsl(348,100%,40%)' : '#333',
-              color: '#fff',
+              background: !resume?.id ? '#222' : resume.enabled ? 'hsl(348,100%,40%)' : '#333',
+              color: !resume?.id ? '#555' : '#fff',
               border: 'none',
               fontFamily: "'Space Mono', monospace",
               fontSize: '0.7rem',
               letterSpacing: '0.08em',
               borderRadius: '1px',
-              cursor: 'pointer',
+              cursor: !resume?.id ? 'not-allowed' : 'pointer',
             }}
           >
-            {resume.enabled ? 'Enabled' : 'Disabled'}
+            {!resume?.id ? 'No Resume Uploaded' : resume.enabled ? 'Enabled' : 'Disabled'}
           </button>
         </div>
 
-        {resume.url && (
+        {resume?.url && (
           <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', color: '#666', marginBottom: '1rem' }}>
             Current: {resume.filename}
           </div>
@@ -1050,6 +1102,360 @@ function ResumeTab({ data, onRefetch }: any) {
           }}
         />
       </div>
+
+      {/* ── Pending Requests ── */}
+      <AdminLabel>Pending Requests</AdminLabel>
+      <div style={{
+        background: '#111',
+        border: '1px solid #1a1a1a',
+        borderRadius: '2px',
+        padding: '1.5rem',
+        marginBottom: '1.5rem',
+      }}>
+        {loadingRequests ? (
+          <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', color: '#555' }}>
+            Loading...
+          </div>
+        ) : pendingRequests.length === 0 ? (
+          <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', color: '#555' }}>
+            No pending requests.
+          </div>
+        ) : (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {pendingRequests.map((r: any) => (
+              <div key={r.id} style={{
+                background: '#0a0a0a',
+                border: '1px solid #222',
+                borderRadius: '2px',
+                padding: '1rem',
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: '0.85rem', color: '#f0ede8', marginBottom: '0.3rem' }}>
+                      {r.email}
+                    </div>
+                    <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', color: '#888', marginBottom: '0.5rem', lineHeight: 1.5 }}>
+                      {r.reason}
+                    </div>
+                    <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.65rem', color: '#555' }}>
+                      {new Date(r.createdAt).toLocaleString('en-ZA', { timeZone: 'Africa/Johannesburg' })}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                    <button
+                      onClick={() => handleAction(r.token, 'approve')}
+                      disabled={actionLoading === r.token + 'approve'}
+                      style={{
+                        padding: '0.45rem 1rem',
+                        background: '#22c55e',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '1px',
+                        fontFamily: "'Space Mono', monospace",
+                        fontSize: '0.68rem',
+                        letterSpacing: '0.06em',
+                        cursor: 'pointer',
+                        opacity: actionLoading === r.token + 'approve' ? 0.6 : 1,
+                      }}
+                    >
+                      {actionLoading === r.token + 'approve' ? 'Approving...' : 'Approve'}
+                    </button>
+                    <button
+                      onClick={() => handleAction(r.token, 'deny')}
+                      disabled={actionLoading === r.token + 'deny'}
+                      style={{
+                        padding: '0.45rem 1rem',
+                        background: '#ef4444',
+                        color: '#fff',
+                        border: 'none',
+                        borderRadius: '1px',
+                        fontFamily: "'Space Mono', monospace",
+                        fontSize: '0.68rem',
+                        letterSpacing: '0.06em',
+                        cursor: 'pointer',
+                        opacity: actionLoading === r.token + 'deny' ? 0.6 : 1,
+                      }}
+                    >
+                      {actionLoading === r.token + 'deny' ? 'Denying...' : 'Deny'}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Past Requests ── */}
+      {pastRequests.length > 0 && (
+        <>
+          <AdminLabel>Past Requests</AdminLabel>
+          <div style={{
+            background: '#111',
+            border: '1px solid #1a1a1a',
+            borderRadius: '2px',
+            padding: '1.5rem',
+            marginBottom: '1.5rem',
+          }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              {pastRequests.map((r: any) => (
+                <div key={r.id} style={{
+                  background: '#0a0a0a',
+                  border: '1px solid #1a1a1a',
+                  borderRadius: '2px',
+                  padding: '0.85rem 1rem',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '1rem',
+                  flexWrap: 'wrap',
+                }}>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontFamily: "'Syne', sans-serif", fontSize: '0.82rem', color: '#f0ede8', marginBottom: '0.2rem' }}>
+                      {r.email}
+                    </div>
+                    <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.65rem', color: '#555' }}>
+                      {new Date(r.createdAt).toLocaleString('en-ZA', { timeZone: 'Africa/Johannesburg' })}
+                    </div>
+                  </div>
+                  <div style={{
+                    fontFamily: "'Space Mono', monospace",
+                    fontSize: '0.65rem',
+                    letterSpacing: '0.1em',
+                    color: statusColor[r.status] ?? '#888',
+                    textTransform: 'uppercase',
+                  }}>
+                    {r.status}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
+}
+
+// ─── THEME TAB ──────────────────────────────────────────────
+function ThemeTab({ data, onRefetch }: any) {
+  const [theme, setTheme] = useState(data.theme || {
+    primaryColor: 'hsl(348, 100%, 40%)',
+    primaryLight: 'hsl(348, 100%, 55%)',
+    primaryDim: 'hsl(348, 60%, 25%)',
+    bgDark: '#0a0a0a',
+    bgDark2: '#111111',
+    bgDark3: '#1a1a1a',
+    bgDark4: '#222222',
+    textLight: '#f0ede8',
+  });
+
+  const save = async () => {
+    await fetch('/api/theme', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(theme),
+    });
+    await fetch('/api/revalidate', { method: 'POST' });
+    onRefetch();
+  };
+
+  const presets = [
+    {
+      name: 'Crimson (Default)',
+      primaryColor: 'hsl(348, 100%, 40%)',
+      primaryLight: 'hsl(348, 100%, 55%)',
+      primaryDim: 'hsl(348, 60%, 25%)',
+      bgDark: '#0a0a0a',
+      bgDark2: '#111111',
+      bgDark3: '#1a1a1a',
+      bgDark4: '#222222',
+      textLight: '#f0ede8',
+    },
+    {
+      name: 'Ocean Blue',
+      primaryColor: 'hsl(210, 100%, 40%)',
+      primaryLight: 'hsl(210, 100%, 55%)',
+      primaryDim: 'hsl(210, 60%, 25%)',
+      bgDark: '#030810',
+      bgDark2: '#060f1a',
+      bgDark3: '#0a1828',
+      bgDark4: '#0f2035',
+      textLight: '#e8f0f0',
+    },
+    {
+      name: 'Emerald',
+      primaryColor: 'hsl(150, 80%, 35%)',
+      primaryLight: 'hsl(150, 80%, 50%)',
+      primaryDim: 'hsl(150, 50%, 20%)',
+      bgDark: '#030a06',
+      bgDark2: '#060f0a',
+      bgDark3: '#0a1a0f',
+      bgDark4: '#0f2218',
+      textLight: '#e8f0eb',
+    },
+    {
+      name: 'Purple',
+      primaryColor: 'hsl(270, 80%, 45%)',
+      primaryLight: 'hsl(270, 80%, 60%)',
+      primaryDim: 'hsl(270, 50%, 25%)',
+      bgDark: '#07030a',
+      bgDark2: '#0e060f',
+      bgDark3: '#180a1a',
+      bgDark4: '#200f22',
+      textLight: '#f0e8f0',
+    },
+    {
+      name: 'Amber',
+      primaryColor: 'hsl(38, 100%, 45%)',
+      primaryLight: 'hsl(38, 100%, 60%)',
+      primaryDim: 'hsl(38, 60%, 25%)',
+      bgDark: '#0a0800',
+      bgDark2: '#110f00',
+      bgDark3: '#1a1600',
+      bgDark4: '#221e00',
+      textLight: '#f0ede8',
+    },
+    {
+      name: 'Pure Dark',
+      primaryColor: 'hsl(0, 0%, 70%)',
+      primaryLight: 'hsl(0, 0%, 90%)',
+      primaryDim: 'hsl(0, 0%, 30%)',
+      bgDark: '#000000',
+      bgDark2: '#0a0a0a',
+      bgDark3: '#141414',
+      bgDark4: '#1e1e1e',
+      textLight: '#ffffff',
+    },
+  ];
+
+  const colorFields = [
+    { key: 'primaryColor', label: 'Primary Color' },
+    { key: 'primaryLight', label: 'Primary Light' },
+    { key: 'primaryDim', label: 'Primary Dim' },
+    { key: 'bgDark', label: 'Background Dark' },
+    { key: 'bgDark2', label: 'Background Dark 2' },
+    { key: 'bgDark3', label: 'Background Dark 3' },
+    { key: 'bgDark4', label: 'Background Dark 4' },
+    { key: 'textLight', label: 'Text Color' },
+  ];
+
+  return (
+    <div>
+      <AdminLabel>Theme Presets</AdminLabel>
+      <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', color: '#666', marginBottom: '1rem' }}>
+        Click a preset to apply it instantly — then save.
+      </p>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))',
+        gap: '0.8rem',
+        marginBottom: '2rem',
+      }}>
+        {presets.map(preset => (
+          <div
+            key={preset.name}
+            onClick={() => setTheme({ ...theme, ...preset })}
+            style={{
+              background: preset.bgDark2,
+              border: '2px solid ' + (theme.primaryColor === preset.primaryColor ? preset.primaryLight : preset.bgDark4),
+              borderRadius: '4px',
+              padding: '1rem',
+              cursor: 'pointer',
+              transition: 'all 0.2s',
+            }}
+          >
+            <div style={{ display: 'flex', gap: '0.4rem', marginBottom: '0.6rem' }}>
+              <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: preset.primaryColor }} />
+              <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: preset.primaryLight }} />
+              <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: preset.bgDark3 }} />
+            </div>
+            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: preset.textLight, letterSpacing: '0.05em' }}>
+              {preset.name}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <AdminLabel>Custom Colors</AdminLabel>
+      <p style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', color: '#666', marginBottom: '1rem' }}>
+        Click the colour swatch to pick any colour. Supports hex, hsl, rgb.
+      </p>
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))',
+        gap: '1rem',
+        marginBottom: '2rem',
+      }}>
+        {colorFields.map(field => (
+          <div key={field.key} style={{ background: '#111', border: '1px solid #1a1a1a', borderRadius: '2px', padding: '1rem' }}>
+            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.6rem' }}>
+              {field.label}
+            </div>
+            <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>
+              <input
+                type="color"
+                value={cssToHex((theme as any)[field.key] || '#000000')}
+                onChange={e => setTheme({ ...theme, [field.key]: e.target.value })}
+                style={{ width: '40px', height: '40px', border: 'none', borderRadius: '4px', cursor: 'pointer', background: 'transparent' }}
+              />
+              <input
+                type="text"
+                value={(theme as any)[field.key] || ''}
+                onChange={e => setTheme({ ...theme, [field.key]: e.target.value })}
+                style={{ flex: 1, background: '#0a0a0a', border: '1px solid #222', color: '#f0ede8', padding: '0.4rem 0.6rem', fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', borderRadius: '1px', outline: 'none' }}
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <AdminLabel>Preview</AdminLabel>
+      <div style={{
+        background: (theme as any).bgDark || '#0a0a0a',
+        border: '1px solid #333',
+        borderRadius: '4px',
+        padding: '2rem',
+        marginBottom: '2rem',
+      }}>
+        <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', color: (theme as any).primaryLight, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '0.8rem' }}>
+          Software & Design Engineer
+        </div>
+        <div style={{ fontFamily: "'Syne', sans-serif", fontSize: '2.5rem', fontWeight: 800, color: (theme as any).textLight, lineHeight: 1, marginBottom: '0.5rem' }}>
+          Angelo
+        </div>
+        <div style={{ fontFamily: "'Syne', sans-serif", fontSize: '2.5rem', fontWeight: 800, color: (theme as any).primaryLight, lineHeight: 1, marginBottom: '1rem' }}>
+          Waterwitch
+        </div>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <div style={{ padding: '0.6rem 1.5rem', background: (theme as any).primaryColor, color: '#fff', borderRadius: '2px', fontFamily: "'Syne', sans-serif", fontSize: '0.8rem', fontWeight: 700 }}>
+            Download CV
+          </div>
+          <div style={{ padding: '0.6rem 1.5rem', border: '1px solid #444', color: (theme as any).textLight, borderRadius: '2px', fontFamily: "'Syne', sans-serif", fontSize: '0.8rem' }}>
+            Get In Touch
+          </div>
+        </div>
+      </div>
+
+      <SaveButton onSave={save} label="Apply Theme to Site" />
+    </div>
+  );
+}
+
+// ─── HELPERS ────────────────────────────────────────────────
+function cssToHex(color: string): string {
+  if (color.startsWith('#')) return color;
+  try {
+    const d = document.createElement('div');
+    d.style.color = color;
+    document.body.appendChild(d);
+    const rgb = window.getComputedStyle(d).color;
+    document.body.removeChild(d);
+    const match = rgb.match(/\d+/g);
+    if (!match) return '#000000';
+    const [r, g, b] = match.map(Number);
+    return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+  } catch {
+    return '#000000';
+  }
 }

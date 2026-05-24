@@ -151,6 +151,7 @@ model Branding {
   id          String   @id @default(cuid())
   logoText    String   @default("AW.")
   logoUrl     String?
+  faviconUrl  String?  // add this line
   displayFont String   @default("Syne")
   monoFont    String   @default("Space Mono")
   createdAt   DateTime @default(now())
@@ -182,4 +183,39 @@ model ResumeFile {
   enabled   Boolean  @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model ThemeSettings {
+  id              String   @id @default(cuid())
+  primaryColor    String   @default("hsl(348, 100%, 40%)")
+  primaryLight    String   @default("hsl(348, 100%, 55%)")
+  primaryDim      String   @default("hsl(348, 60%, 25%)")
+  bgDark          String   @default("#0a0a0a")
+  bgDark2         String   @default("#111111")
+  bgDark3         String   @default("#1a1a1a")
+  bgDark4         String   @default("#222222")
+  textLight       String   @default("#f0ede8")
+  displayFont     String   @default("Syne")
+  monoFont        String   @default("Space Mono")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model ResumeRequest {
+  id          String              @id @default(cuid())
+  email       String
+  reason      String
+  status      ResumeRequestStatus @default(PENDING)
+  token       String              @unique @default(cuid())
+  tokenExpiry DateTime
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+}
+
+enum ResumeRequestStatus {
+  PENDING
+  APPROVED
+  DENIED
 }

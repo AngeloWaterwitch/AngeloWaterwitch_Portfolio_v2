@@ -1,27 +1,39 @@
 'use client';
 
+import { useState } from 'react';
 import { motion } from 'framer-motion';
+import ResumeRequestModal from './ResumeRequestModal';
+
+const sectionStyle: React.CSSProperties = {
+  minHeight: '100vh',
+  display: 'flex',
+  alignItems: 'center',
+  padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 3rem)',
+  paddingTop: 'clamp(5rem, 10vw, 8rem)',
+  position: 'relative',
+  overflow: 'hidden',
+};
+
+const gridBgStyle: React.CSSProperties = {
+  position: 'absolute',
+  inset: 0,
+  backgroundImage: `linear-gradient(color-mix(in srgb, var(--cr-primary) 4%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--cr-primary) 4%, transparent) 1px, transparent 1px)`,
+  backgroundSize: '60px 60px',
+};
+
+const radialBgStyle: React.CSSProperties = {
+  position: 'absolute',
+  inset: 0,
+  background: 'radial-gradient(ellipse 60% 80% at 80% 50%, var(--cr-dim) 0%, transparent 70%)',
+};
 
 export default function Hero({ hero, resume }: any) {
+  const [showModal, setShowModal] = useState(false);
+
   return (
-    <section id="home" style={{
-      minHeight: '100vh',
-      display: 'flex',
-      alignItems: 'center',
-      padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 3rem)',
-      paddingTop: 'clamp(5rem, 10vw, 8rem)',
-      position: 'relative',
-      overflow: 'hidden',
-    }}>
-      <div style={{
-        position: 'absolute', inset: 0,
-        backgroundImage: `linear-gradient(rgba(220,30,60,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(220,30,60,0.04) 1px, transparent 1px)`,
-        backgroundSize: '60px 60px',
-      }} />
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: 'radial-gradient(ellipse 60% 80% at 80% 50%, hsl(348,60%,12%) 0%, transparent 70%)',
-      }} />
+    <section id="home" style={sectionStyle}>
+      <div style={gridBgStyle} />
+      <div style={radialBgStyle} />
 
       <div style={{ position: 'relative', zIndex: 2, maxWidth: '800px', width: '100%' }}>
         <motion.div
@@ -31,7 +43,7 @@ export default function Hero({ hero, resume }: any) {
           style={{
             fontFamily: 'var(--font-mono)',
             fontSize: 'clamp(0.65rem, 2vw, 0.8rem)',
-            color: 'hsl(348,100%,55%)',
+            color: 'var(--cr-light)',
             letterSpacing: '0.2em',
             marginBottom: '1.5rem',
             display: 'flex',
@@ -39,7 +51,7 @@ export default function Hero({ hero, resume }: any) {
             gap: '0.8rem',
           }}
         >
-          <span style={{ display: 'inline-block', width: '2rem', height: '1px', background: 'hsl(348,100%,55%)', flexShrink: 0 }} />
+          <span style={{ display: 'inline-block', width: '2rem', height: '1px', background: 'var(--cr-light)', flexShrink: 0 }} />
           {hero?.role}
         </motion.div>
 
@@ -57,7 +69,7 @@ export default function Hero({ hero, resume }: any) {
           }}
         >
           {hero?.name?.split(' ').map((word: string, i: number) => (
-            <span key={i} style={{ display: 'block', color: i === 1 ? 'hsl(348,100%,55%)' : '#f0ede8' }}>
+            <span key={i} style={{ display: 'block', color: i === 1 ? 'var(--cr-light)' : 'var(--cr-text)' }}>
               {word}
             </span>
           ))}
@@ -82,48 +94,53 @@ export default function Hero({ hero, resume }: any) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.5 }}
-          style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}
+          style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}
         >
           {hero?.resumeEnabled && resume?.enabled && (
-            <a
-              href={resume?.url || hero?.resumeUrl}
-              download
-               onClick={async () => {
-                await fetch('/api/resume/download', { method: 'POST' });
-              }}
-              style={{
-                padding: 'clamp(0.7rem, 2vw, 0.85rem) clamp(1.2rem, 3vw, 2rem)',
-                background: 'hsl(348,100%,40%)',
-                color: '#fff',
-                fontFamily: 'var(--font-display)',
-                fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
-                fontWeight: 700,
-                letterSpacing: '0.12em',
-                textTransform: 'uppercase',
-                borderRadius: '2px',
-                border: '1px solid hsl(348,100%,40%)',
-                textDecoration: 'none',
-                display: 'inline-block',
-                transition: 'all 0.2s',
-              }}
-              onMouseEnter={e => {
-                e.currentTarget.style.background = 'transparent';
-                e.currentTarget.style.color = 'hsl(348,100%,55%)';
-              }}
-              onMouseLeave={e => {
-                e.currentTarget.style.background = 'hsl(348,100%,40%)';
-                e.currentTarget.style.color = '#fff';
-              }}
-            >
-              {hero?.resumeLabel || 'Download CV'}
-            </a>
+            <>
+              <button
+                onClick={() => setShowModal(true)}
+                style={{
+                  padding: 'clamp(0.7rem, 2vw, 0.85rem) clamp(1.2rem, 3vw, 2rem)',
+                  background: 'var(--cr-primary)',
+                  color: '#fff',
+                  fontFamily: 'var(--font-display)',
+                  fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
+                  fontWeight: 700,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  borderRadius: '2px',
+                  border: '1px solid var(--cr-primary)',
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                }}
+                onMouseEnter={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.background = 'transparent';
+                  e.currentTarget.style.color = 'var(--cr-light)';
+                }}
+                onMouseLeave={(e: React.MouseEvent<HTMLButtonElement>) => {
+                  e.currentTarget.style.background = 'var(--cr-primary)';
+                  e.currentTarget.style.color = '#fff';
+                }}
+              >
+                {hero?.resumeLabel || 'Download CV'}
+              </button>
+
+              {showModal && (
+                <ResumeRequestModal
+                  resumeLabel={hero?.resumeLabel}
+                  onClose={() => setShowModal(false)}
+                />
+              )}
+            </>
           )}
+
           <a
             href="#contact"
             style={{
               padding: 'clamp(0.7rem, 2vw, 0.85rem) clamp(1.2rem, 3vw, 2rem)',
               background: 'transparent',
-              color: '#f0ede8',
+              color: 'var(--cr-text)',
               fontFamily: 'var(--font-display)',
               fontSize: 'clamp(0.75rem, 2vw, 0.85rem)',
               fontWeight: 600,
@@ -135,13 +152,13 @@ export default function Hero({ hero, resume }: any) {
               display: 'inline-block',
               transition: 'all 0.2s',
             }}
-            onMouseEnter={e => {
-              e.currentTarget.style.borderColor = 'hsl(348,100%,55%)';
-              e.currentTarget.style.color = 'hsl(348,100%,55%)';
+            onMouseEnter={(e: React.MouseEvent<HTMLAnchorElement>) => {
+              e.currentTarget.style.borderColor = 'var(--cr-light)';
+              e.currentTarget.style.color = 'var(--cr-light)';
             }}
-            onMouseLeave={e => {
+            onMouseLeave={(e: React.MouseEvent<HTMLAnchorElement>) => {
               e.currentTarget.style.borderColor = '#444';
-              e.currentTarget.style.color = '#f0ede8';
+              e.currentTarget.style.color = 'var(--cr-text)';
             }}
           >
             Get In Touch
@@ -156,7 +173,7 @@ export default function Hero({ hero, resume }: any) {
       }}>
         <div style={{
           width: '1px', height: '60px',
-          background: 'linear-gradient(to bottom, hsl(348,100%,40%), transparent)',
+          background: 'linear-gradient(to bottom, var(--cr-primary), transparent)',
           animation: 'scrollPulse 2s ease-in-out infinite',
         }} />
         <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: '#555', letterSpacing: '0.15em' }}>

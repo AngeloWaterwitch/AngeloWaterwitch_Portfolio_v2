@@ -12,6 +12,9 @@ const ALLOWED_TYPES = [
   'image/png',
   'image/webp',
   'image/gif',
+  'image/svg+xml',
+  'image/x-icon',
+  'image/vnd.microsoft.icon',
   'application/pdf',
 ];
 
@@ -31,7 +34,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!ALLOWED_TYPES.includes(file.type)) {
-      return NextResponse.json({ error: 'File type not allowed' }, { status: 400 });
+      return NextResponse.json({ error: `File type not allowed: ${file.type}` }, { status: 400 });
     }
 
     if (file.size > MAX_SIZE) {
@@ -55,12 +58,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: uploadError.message }, { status: 500 });
     }
 
-    const { data: urlData } = supabase.storage
-      .from('portfolio')
-      .getPublicUrl(filename);
+    // Resume files expire in 48 hours (short-lived, per request)
+    // All other files (logos, photos, project images) get 10-year URLs
+    const expiresIn = folder === 'resume' ? 60 * 60 * 48 : 60 * 60 * 24 * 365 * 10;
 
-    return NextResponse.json({ url: urlData.publicUrl, path: filename });
+    const { data: signedData, error: signedError } = await supabase.storage
+      .from('portfolio')
+      .createSignedUrl(filename, expiresIn);
+
+    if (signedError || !signedData?.signedUrl) {
+      return NextResponse.json({ error: 'Could not generate file URL' }, { status: 500 });
+    }
+
+    return NextResponse.json({ url: signedData.signedUrl, path: filename });
   } catch (err) {
+    console.error('[upload] error:', err);
     return NextResponse.json({ error: 'Upload failed' }, { status: 500 });
   }
 }

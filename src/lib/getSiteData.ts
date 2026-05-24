@@ -14,6 +14,7 @@ export async function getSiteData() {
     branding,
     sections,
     resume,
+    theme,
   ] = await Promise.all([
     prisma.heroContent.findFirst(),
     prisma.aboutContent.findFirst(),
@@ -33,6 +34,7 @@ export async function getSiteData() {
     prisma.branding.findFirst(),
     prisma.siteSection.findMany({ orderBy: { order: 'asc' } }),
     prisma.resumeFile.findFirst({ where: { enabled: true } }),
+    prisma.themeSettings.findFirst(),
   ]);
 
   return {
@@ -48,5 +50,6 @@ export async function getSiteData() {
     branding,
     sections,
     resume,
+    theme,
   };
 }
