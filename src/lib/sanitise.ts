@@ -10,11 +10,11 @@ function decodeHtmlEntities(str: string): string {
 }
 
 export function sanitise(input: string): string {
-  const sanitized = sanitizeHtml(input, {
+  const decoded = decodeHtmlEntities(input); // decode first
+  return sanitizeHtml(decoded, {
     allowedTags: [],
     allowedAttributes: {},
   }).trim();
-  return decodeHtmlEntities(sanitized);
 }
 
 export function sanitiseObject<T extends Record<string, any>>(obj: T): T {
