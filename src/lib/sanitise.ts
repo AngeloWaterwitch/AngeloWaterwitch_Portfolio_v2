@@ -1,5 +1,3 @@
-import sanitizeHtml from 'sanitize-html';
-
 function decodeHtmlEntities(str: string): string {
   return str
     .replace(/&amp;/g, '&')
@@ -9,12 +7,14 @@ function decodeHtmlEntities(str: string): string {
     .replace(/&#39;/g, "'");
 }
 
+function stripHtmlTags(str: string): string {
+  return str.replace(/<[^>]*>/g, '');
+}
+
 export function sanitise(input: string): string {
-  const decoded = decodeHtmlEntities(input); // decode first
-  return sanitizeHtml(decoded, {
-    allowedTags: [],
-    allowedAttributes: {},
-  }).trim();
+  const decoded = decodeHtmlEntities(input);
+  const stripped = stripHtmlTags(decoded);
+  return stripped.trim();
 }
 
 export function sanitiseObject<T extends Record<string, any>>(obj: T): T {
