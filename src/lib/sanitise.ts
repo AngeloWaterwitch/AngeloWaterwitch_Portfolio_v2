@@ -1,10 +1,20 @@
 import sanitizeHtml from 'sanitize-html';
 
+function decodeHtmlEntities(str: string): string {
+  return str
+    .replace(/&amp;/g, '&')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
+}
+
 export function sanitise(input: string): string {
-  return sanitizeHtml(input, {
+  const sanitized = sanitizeHtml(input, {
     allowedTags: [],
     allowedAttributes: {},
   }).trim();
+  return decodeHtmlEntities(sanitized);
 }
 
 export function sanitiseObject<T extends Record<string, any>>(obj: T): T {
