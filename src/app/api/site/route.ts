@@ -16,7 +16,9 @@ function decodeObj<T extends Record<string, any>>(obj: T | null): T | null {
   const result: any = {};
   for (const key of Object.keys(obj)) {
     const val = obj[key];
-    if (typeof val === 'string') {
+    if (val instanceof Date) {
+      result[key] = val;
+    } else if (typeof val === 'string') {
       result[key] = decode(val);
     } else if (Array.isArray(val)) {
       result[key] = val.map(v => typeof v === 'object' && v !== null ? decodeObj(v) : typeof v === 'string' ? decode(v) : v);
