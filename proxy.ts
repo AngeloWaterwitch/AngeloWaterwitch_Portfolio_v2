@@ -9,13 +9,15 @@ export default function proxy(req: NextRequest) {
 
   if (isApiAuth) return NextResponse.next();
 
+  const baseUrl = req.nextUrl.origin;
+
   if (isAdminPage) {
     const token =
       req.cookies.get('authjs.session-token')?.value ||
       req.cookies.get('__Secure-authjs.session-token')?.value;
 
     if (!token) {
-      return NextResponse.redirect(new URL('/admin/login', req.url));
+      return NextResponse.redirect(new URL('/admin/login', baseUrl));
     }
   }
 
@@ -25,7 +27,7 @@ export default function proxy(req: NextRequest) {
       req.cookies.get('__Secure-authjs.session-token')?.value;
 
     if (token) {
-      return NextResponse.redirect(new URL('/admin', req.url));
+      return NextResponse.redirect(new URL('/admin', baseUrl));
     }
   }
 
