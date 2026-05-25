@@ -202,7 +202,11 @@ export default function AdminPage() {
 
 // ─── HERO TAB ───────────────────────────────────────────────
 function HeroTab({ data, onRefetch }: any) {
-  const [form, setForm] = useState(data.hero || {});
+ const [form, setForm] = useState(data.hero || {});
+
+useEffect(() => {
+  setForm(data.hero || {});
+}, [data.hero]);
 
   const save = async () => {
     await fetch('/api/hero', {
