@@ -30,7 +30,7 @@ export async function PUT(req: NextRequest) {
     const body = await req.json();
     const parsed = heroSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
+      return NextResponse.json({ error: 'Invalid data', issues: parsed.error.issues }, { status: 400 });
     }
     const clean = sanitiseObject(parsed.data);
     const existing = await prisma.heroContent.findFirst();
@@ -39,7 +39,12 @@ export async function PUT(req: NextRequest) {
       : await prisma.heroContent.create({ data: clean });
     revalidatePath('/');
     return NextResponse.json(hero);
-  } catch {
-    return NextResponse.json({ error: 'Failed' }, { status: 500 });
+  } catch (err) {
+    console.error('Hero PUT error:', err);
+    return NextResponse.json({ 
+      error: 'Failed', 
+      detail: String(err),
+      message: (err as any)?.message,
+    }, { status: 500 });
   }
 }
