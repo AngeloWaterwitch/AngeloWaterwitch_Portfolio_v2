@@ -1,26 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { Resend } from 'resend';
+import { verifyRecaptcha } from '@/lib/recaptcha';
+import { allowRequest } from '@/lib/ratelimit';
  
 const resend = new Resend(process.env.RESEND_API_KEY);
  
-async function verifyRecaptcha(token: string): Promise<boolean> {
-  if (process.env.NODE_ENV === 'development') {
-    console.log('[reCAPTCHA] Skipping in development');
-    return true;
-  }
-  const res = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: `secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`,
-  });
-  const data = await res.json();
-  console.log('[reCAPTCHA response]', JSON.stringify(data));
-  return data.success && data.score >= 0.5;
-}
- 
 export async function POST(req: NextRequest) {
   try {
+    if (!(await allowRequest(req, 'resume-request', 3, '1 h'))) {
+      return NextResponse.json({ error: 'Too many requests. Please try again later.' }, { status: 429 });
+    }
     const { email, reason, recaptchaToken } = await req.json();
  
     if (!email || !reason || !recaptchaToken) {
@@ -28,8 +18,8 @@ export async function POST(req: NextRequest) {
     }
  
     // 1. Verify reCAPTCHA
-    const isHuman = await verifyRecaptcha(recaptchaToken);
-    if (!isHuman) {
+    const captcha = await verifyRecaptcha(recaptchaToken, 'resume_request');
+    if (!captcha.ok) {
       return NextResponse.json({ error: 'reCAPTCHA verification failed.' }, { status: 403 });
     }
  
@@ -37,7 +27,6 @@ export async function POST(req: NextRequest) {
     const tokenExpiry = new Date(Date.now() + 48 * 60 * 60 * 1000);
  
     // 3. Save request to DB
-    console.log('[resume/download] Attempting DB write with:', { email, reason, tokenExpiry });
     const request = await prisma.resumeRequest.create({
       data: {
         email,
@@ -47,7 +36,6 @@ export async function POST(req: NextRequest) {
         userAgent: req.headers.get('user-agent') ?? undefined,
       },
     });
-    console.log('[resume/download] DB write success, token:', request.token);
  
     // 4. Log activity
     await prisma.activityLog.create({

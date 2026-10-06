@@ -84,7 +84,7 @@ export default function Navbar({ sections, branding }: any) {
             </ul>
  
             <a
-              href="/admin"
+              href="/admin/login"
               style={{
                 fontFamily: 'var(--font-mono)',
                 fontSize: '0.72rem',
@@ -152,7 +152,7 @@ export default function Navbar({ sections, branding }: any) {
             </a>
           ))}
           <a
-            href="/admin"
+            href="/admin/login"
             style={{
               fontFamily: 'var(--font-mono)',
               fontSize: '0.72rem',

@@ -1,7 +1,8 @@
 'use client';
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { getRecaptchaToken } from '@/lib/recaptcha-client';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -10,22 +11,38 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Opening the admin always asks for credentials: drop any previous session.
+  useEffect(() => {
+    signOut({ redirect: false }).catch(() => {});
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    let recaptchaToken = '';
+    try {
+      recaptchaToken = await getRecaptchaToken('admin_login');
+    } catch {
+      setError('Could not load the security check. Please reload and try again.');
+      setLoading(false);
+      return;
+    }
+
     const result = await signIn('credentials', {
       email,
       password,
+      recaptchaToken,
       redirect: false,
     });
 
     if (result?.error) {
-      setError('Invalid email or password');
+   setError('Sign-in failed. Check your details, or wait a few minutes if you have tried several times.');
       setLoading(false);
     } else {
       router.push('/admin');
+      router.refresh();
     }
   };
 
@@ -81,6 +98,7 @@ export default function LoginPage() {
             </label>
             <input
               type="email"
+              autoComplete="username"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="your@email.com"
@@ -113,6 +131,7 @@ export default function LoginPage() {
             </label>
             <input
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="••••••••"

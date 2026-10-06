@@ -11,10 +11,16 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [theme, branding] = await Promise.all([
-    prisma.themeSettings.findFirst(),
-    prisma.branding.findFirst(),
-  ]);
+  let theme: Awaited<ReturnType<typeof prisma.themeSettings.findFirst>> = null;
+  let branding: Awaited<ReturnType<typeof prisma.branding.findFirst>> = null;
+  try {
+    [theme, branding] = await Promise.all([
+      prisma.themeSettings.findFirst(),
+      prisma.branding.findFirst(),
+    ]);
+  } catch (err) {
+    console.error('[layout] database unavailable, using default theme:', (err as Error).message);
+  }
 
   const cssVars = `
     :root {
