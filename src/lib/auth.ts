@@ -40,7 +40,16 @@ function safeEqual(a: string, b: string) {
 
 async function checkPassword(password: string): Promise<boolean> {
   const hash = process.env.ADMIN_PASSWORD_HASH;
-  if (hash) return bcrypt.compare(password, hash);
+  if (hash) {
+    if (!/^$2[aby]$d{2}$[./A-Za-z0-9]{53}$/.test(hash)) {
+      console.error(
+        `[auth] ADMIN_PASSWORD_HASH is malformed (length ${hash.length}, starts "${hash.slice(0, 4)}"). ` +
+          'It must be 60 characters starting with $2b$12$ and contain no backslashes or spaces.',
+      );
+      return false;
+    }
+    return bcrypt.compare(password, hash);
+  }
 
   // Legacy fallback so the admin is not locked out before the hash is configured.
   const legacy = process.env.ADMIN_PASSWORD;
