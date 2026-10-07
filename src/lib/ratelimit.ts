@@ -10,11 +10,16 @@ function getLimiter(name: string, max: number, window: Window) {
   let l = limiters.get(key);
   if (!l) {
     if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) return null;
-    l = new Ratelimit({
-      redis: Redis.fromEnv(),
-      limiter: Ratelimit.slidingWindow(max, window),
-      prefix: `rl:${name}`,
-    });
+    try {
+      l = new Ratelimit({
+        redis: Redis.fromEnv(),
+        limiter: Ratelimit.slidingWindow(max, window),
+        prefix: `rl:${name}`,
+      });
+    } catch (err) {
+      console.error(`[ratelimit:${name}] misconfigured, continuing without it:`, (err as Error).message);
+      return null;
+    }
     limiters.set(key, l);
   }
   return l;

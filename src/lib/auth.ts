@@ -20,11 +20,17 @@ let loginLimiter: Ratelimit | null = null;
 function getLimiter() {
   if (loginLimiter) return loginLimiter;
   if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) return null;
-  loginLimiter = new Ratelimit({
-    redis: Redis.fromEnv(),
-    limiter: Ratelimit.slidingWindow(5, '15 m'),
-    prefix: 'rl:admin-login',
-  });
+  try {
+    loginLimiter = new Ratelimit({
+      redis: Redis.fromEnv(),
+      limiter: Ratelimit.slidingWindow(5, '15 m'),
+      prefix: 'rl:admin-login',
+    });
+  } catch (err) {
+    // A bad Upstash setting must never take login down.
+    console.error('[auth] rate limiter misconfigured, continuing without it:', (err as Error).message);
+    return null;
+  }
   return loginLimiter;
 }
 
