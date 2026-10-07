@@ -25,7 +25,7 @@ export default function LoginPage() {
     try {
       recaptchaToken = await getRecaptchaToken('admin_login');
     } catch {
-      setError('Could not load the security check. Please reload and try again.');
+      setError('Could not reach the security check (reCAPTCHA). Check your internet connection, disable ad-blockers or VPN for this site, then try again.');
       setLoading(false);
       return;
     }
