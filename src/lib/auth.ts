@@ -52,10 +52,17 @@ function safeEqual(a: string, b: string) {
   return timingSafeEqual(ab, bb);
 }
 
+const BCRYPT_FORMAT = /^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/;
+
+/** Trims spaces and strips accidental surrounding quotes from an env var pasted into a dashboard. */
+function cleanEnv(value: string | undefined): string {
+  return (value ?? '').trim().replace(/^["']+|["']+$/g, '').trim();
+}
+
 async function checkPassword(password: string): Promise<boolean> {
-  const hash = process.env.ADMIN_PASSWORD_HASH;
+  const hash = cleanEnv(process.env.ADMIN_PASSWORD_HASH);
   if (hash) {
-    if (!/^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/.test(hash)) {
+    if (!BCRYPT_FORMAT.test(hash)) {
       console.error(
         `[auth] ADMIN_PASSWORD_HASH is malformed (length ${hash.length}, starts "${hash.slice(0, 4)}"). ` +
           'It must be 60 characters starting with $2b$12$ and contain no backslashes or spaces.',
@@ -99,14 +106,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         // 1. Throttle brute force by IP + email.
         const limiter = getLimiter();
         if (limiter) {
+          let allowed = true;
           try {
-            const { success } = await limiter.limit(`${clientIp(request)}:${email.toLowerCase()}`);
-            if (!success) {
-              console.warn('[auth] login throttled');
-              throw new ThrottledError();
-            }
+            allowed = (await limiter.limit(`${clientIp(request)}:${email.toLowerCase()}`)).success;
           } catch (err) {
             console.error('[auth] rate limiter unavailable:', (err as Error).message);
+          }
+          if (!allowed) {
+            console.warn('[auth] login throttled');
+            throw new ThrottledError();
           }
         }
 
@@ -118,20 +126,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         }
 
         // 3. Credentials (always run the password check to keep timing uniform).
-        const adminEmail = (process.env.ADMIN_EMAIL ?? '').toLowerCase();
-        if (!adminEmail || (!process.env.ADMIN_PASSWORD_HASH && !process.env.ADMIN_PASSWORD)) {
+        const adminEmail = cleanEnv(process.env.ADMIN_EMAIL).toLowerCase();
+        if (!adminEmail || (!cleanEnv(process.env.ADMIN_PASSWORD_HASH) && !process.env.ADMIN_PASSWORD)) {
           console.error('[auth] ADMIN_EMAIL and ADMIN_PASSWORD_HASH must be set');
           throw new ConfigError();
         }
-        const hashEnv = process.env.ADMIN_PASSWORD_HASH;
-        if (hashEnv && !/^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/.test(hashEnv)) throw new ConfigError();
+        const hashEnv = cleanEnv(process.env.ADMIN_PASSWORD_HASH);
+        if (hashEnv && !BCRYPT_FORMAT.test(hashEnv)) throw new ConfigError();
         const passwordOk = await checkPassword(password);
-        const emailOk = adminEmail !== '' && safeEqual(email.toLowerCase(), adminEmail);
+        const emailOk = safeEqual(email.trim().toLowerCase(), adminEmail);
 
         if (emailOk && passwordOk) {
           return { id: 'admin', email: adminEmail, name: 'Angelo Waterwitch', role: 'ADMIN' } as any;
         }
-        console.warn('[auth] failed login attempt');
+        // Which half failed is logged server-side only; the user always sees one generic message.
+        console.warn(`[auth] failed login attempt (email match: ${emailOk}, password match: ${passwordOk})`);
         return null;
       },
     }),
