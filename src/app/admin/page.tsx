@@ -9,6 +9,7 @@ import { SaveButton } from './components/SaveButton';
 import { FileUpload } from './components/FileUpload';
 import { SectionsTab } from './components/SectionsTab';
 import { HeaderFooterTab } from './components/HeaderFooterTab';
+import { ClientsTab } from './components/ClientsTab';
 
 export default function AdminPage() {
   const [data, setData] = useState<any>(null);
@@ -58,6 +59,7 @@ export default function AdminPage() {
     { id: 'timeline', label: 'Timeline' },
     { id: 'testimonials', label: 'Testimonials' },
     { id: 'contact', label: 'Contact' },
+    { id: 'clients', label: 'Clients' },
     { id: 'messages', label: unreadCount > 0 ? `Messages (${unreadCount})` : 'Messages' },
     { id: 'sections', label: 'Sections & Nav' },
     { id: 'headerfooter', label: 'Header & Footer' },
@@ -193,6 +195,7 @@ export default function AdminPage() {
           {activeTab === 'timeline' && <TimelineTab data={data} onRefetch={fetchData} />}
           {activeTab === 'testimonials' && <TestimonialsTab data={data} onRefetch={fetchData} />}
           {activeTab === 'contact' && <ContactTab data={data} onRefetch={fetchData} />}
+          {activeTab === 'clients' && <ClientsTab />}
           {activeTab === 'messages' && <MessagesTab onRefetch={fetchData} />}
           {activeTab === 'sections' && <SectionsTab data={data} onRefetch={fetchData} />}
           {activeTab === 'headerfooter' && <HeaderFooterTab data={data} onRefetch={fetchData} />}
