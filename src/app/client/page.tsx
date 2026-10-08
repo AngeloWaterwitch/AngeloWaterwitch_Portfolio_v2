@@ -3,11 +3,15 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentClient } from '@/lib/client-auth';
 import { PROJECT_STATUS_LABEL, formatRands, formatDate, formatDateTime } from '@/lib/format';
 import LogoutButton from './LogoutButton';
+import ProjectLive from './ProjectLive';
+import { loadWorkData } from '@/lib/worklog';
 
 export const dynamic = 'force-dynamic';
 
 const mono: React.CSSProperties = { fontFamily: "'Space Mono', monospace" };
 const label: React.CSSProperties = { ...mono, fontSize: '0.68rem', color: 'var(--cr-muted)', letterSpacing: '0.15em', textTransform: 'uppercase' };
+
+const dl: React.CSSProperties = { ...mono, fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#ddd', border: '1px solid #3a3a3a', padding: '0.5rem 1rem', textDecoration: 'none', borderRadius: '1px' };
 
 const badgeColor: Record<string, string> = {
   QUOTED: '#9a9a9a', DEPOSIT_PENDING: '#e0a030', IN_PROGRESS: '#3fa7ff', IN_REVIEW: '#b58cff', COMPLETED: '#4caf50', CANCELLED: '#777',
@@ -23,6 +27,10 @@ export default async function ClientDashboard() {
     orderBy: { createdAt: 'desc' },
     include: { updates: { where: { visibleToClient: true }, orderBy: { createdAt: 'desc' }, take: 50 } },
   });
+
+  // Work sessions, overtime and the (client-visible) activity log for each project.
+  const serverNow = Date.now();
+  const work = await Promise.all(projects.map((p) => loadWorkData(p.id, true)));
 
   const lastUpdate = projects
     .flatMap((p) => [p.updatedAt, ...p.updates.map((u) => u.createdAt)])
@@ -50,7 +58,8 @@ export default async function ClientDashboard() {
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
-        {projects.map((p) => {
+        {projects.map((p, i) => {
+          const w = work[i];
           const balance = Math.max(p.totalCents - (p.depositPaidAt ? p.depositCents : 0) - (p.finalPaidAt ? p.totalCents - p.depositCents : 0), 0);
           return (
             <section key={p.id} aria-labelledby={'p-' + p.id} style={{ background: 'var(--cr-bg3, #1a1a1a)', border: '1px solid var(--cr-bg4, #222)', borderRadius: '2px', padding: 'clamp(1.1rem, 4vw, 1.8rem)' }}>
@@ -73,6 +82,23 @@ export default async function ClientDashboard() {
                   <div style={{ width: p.progress + '%', height: '100%', background: 'linear-gradient(90deg, var(--cr-primary, #cc0033), var(--cr-light, #ff1a47))', transition: 'width 0.4s' }} />
                 </div>
               </div>
+
+              {w && (
+                <ProjectLive
+                  projectId={p.id}
+                  serverNow={serverNow}
+                  initial={{
+                    active: w.active ? { startedAt: w.active.startedAt.toISOString(), overtime: w.active.overtime } : null,
+                    lastWorkedAt: w.totals.lastWorkedAt ? w.totals.lastWorkedAt.toISOString() : null,
+                    totalMinutes: w.totals.totalMinutes,
+                    overtimeMinutes: w.totals.overtimeMinutes,
+                    pendingOvertime: (() => {
+                      const o = w.project.overtimeRequests.find((r) => r.status === 'PENDING');
+                      return o ? { id: o.id, reason: o.reason, estimatedMinutes: o.estimatedMinutes, plannedFor: o.plannedFor ? o.plannedFor.toISOString() : null } : null;
+                    })(),
+                  }}
+                />
+              )}
 
               {p.totalCents > 0 && (
                 <dl style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginTop: '1.5rem' }}>
@@ -109,6 +135,29 @@ export default async function ClientDashboard() {
                   </ol>
                 )}
               </div>
+
+              {w && (
+                <details style={{ marginTop: '1.6rem', borderTop: '1px solid #242424', paddingTop: '1.1rem' }}>
+                  <summary style={{ ...label, cursor: 'pointer' }}>Activity log ({w.project.logEntries.length})</summary>
+                  <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap', margin: '1rem 0' }}>
+                    <a href={'/api/client/projects/' + p.id + '/worklog?format=pdf'} style={dl}>Download PDF</a>
+                    <a href={'/api/client/projects/' + p.id + '/worklog?format=csv'} style={dl}>Download CSV</a>
+                  </div>
+                  {w.project.logEntries.length === 0 ? (
+                    <p style={{ color: 'var(--cr-muted)', fontSize: '0.85rem' }}>Nothing recorded yet. Everything done on your project is logged here automatically.</p>
+                  ) : (
+                    <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+                      {w.project.logEntries.slice(0, 40).map((e) => (
+                        <li key={e.id} style={{ display: 'grid', gridTemplateColumns: 'minmax(120px, 160px) 1fr', gap: '0.8rem', padding: '0.45rem 0', borderTop: '1px solid #1f1f1f', fontSize: '0.85rem' }}>
+                          <span style={{ ...mono, fontSize: '0.68rem', color: 'var(--cr-muted)' }}>{formatDateTime(e.createdAt)}</span>
+                          <span style={{ color: '#ccc' }}>{e.message}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                  {w.project.logEntries.length > 40 && <p style={{ ...mono, fontSize: '0.7rem', color: 'var(--cr-muted)', marginTop: '0.8rem' }}>Showing the latest 40. Download the full log above.</p>}
+                </details>
+              )}
             </section>
           );
         })}

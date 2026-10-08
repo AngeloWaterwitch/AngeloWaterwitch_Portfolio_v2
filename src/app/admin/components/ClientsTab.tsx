@@ -5,6 +5,7 @@ import { AdminLabel } from './AdminLabel';
 import { AdminField } from './AdminField';
 import { AdminGrid } from './AdminGrid';
 import { AdminToggle } from './AdminToggle';
+import { WorkPanel } from './WorkPanel';
 import { PROJECT_STATUS_LABEL, formatDate, formatDateTime } from '@/lib/format';
 
 const mono: React.CSSProperties = { fontFamily: "'Space Mono', monospace" };
@@ -297,6 +298,8 @@ function ProjectEditor({ project, run, reload }: { project: any; run: (fn: () =>
         <AdminToggle label="Visible to the client" checked={upd.visible} onChange={(v) => setUpd({ ...upd, visible: v })} />
       </AdminGrid>
       <button type="button" style={btn(true)} onClick={post}>Post update</button>
+
+      <WorkPanel projectId={project.id} locked={['COMPLETED', 'CANCELLED'].includes(project.status)} />
 
       {project.updates.length > 0 && (
         <ol style={{ listStyle: 'none', padding: 0, margin: '1.4rem 0 0' }}>

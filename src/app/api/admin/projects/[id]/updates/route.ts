@@ -5,6 +5,7 @@ import { requireAuth } from '@/lib/api-auth';
 import { sanitise } from '@/lib/sanitise';
 import { audit } from '@/lib/audit';
 import { clientIp } from '@/lib/ratelimit';
+import { logEvent } from '@/lib/worklog';
 
 const text = (min: number, max: number) => z.string().min(min).max(max).transform((s) => sanitise(s));
 
@@ -39,5 +40,6 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   ]);
 
   await audit('ADMIN', 'admin', 'project.update.post', { projectId: id, updateId: update.id }, clientIp(req));
+  await logEvent(id, 'UPDATE_POSTED', `Update posted: ${d.title}`, { visible: d.visibleToClient });
   return NextResponse.json(update, { status: 201 });
 }

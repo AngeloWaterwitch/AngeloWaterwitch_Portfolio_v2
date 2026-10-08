@@ -22,15 +22,15 @@ enum Role {
 }
 
 model HeroContent {
-  id             String   @id @default(cuid())
-  name           String
-  role           String
-  sub            String
-  resumeEnabled  Boolean  @default(true)
-  resumeUrl      String?
-  resumeLabel    String   @default("Download CV")
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  role          String
+  sub           String
+  resumeEnabled Boolean  @default(true)
+  resumeUrl     String?
+  resumeLabel   String   @default("Download CV")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 }
 
 model AboutContent {
@@ -151,7 +151,7 @@ model Branding {
   id          String   @id @default(cuid())
   logoText    String   @default("AW.")
   logoUrl     String?
-  faviconUrl  String?  // add this line
+  faviconUrl  String? // add this line
   displayFont String   @default("Syne")
   monoFont    String   @default("Space Mono")
   createdAt   DateTime @default(now())
@@ -186,19 +186,19 @@ model ResumeFile {
 }
 
 model ThemeSettings {
-  id              String   @id @default(cuid())
-  primaryColor    String   @default("hsl(348, 100%, 40%)")
-  primaryLight    String   @default("hsl(348, 100%, 55%)")
-  primaryDim      String   @default("hsl(348, 60%, 25%)")
-  bgDark          String   @default("#0a0a0a")
-  bgDark2         String   @default("#111111")
-  bgDark3         String   @default("#1a1a1a")
-  bgDark4         String   @default("#222222")
-  textLight       String   @default("#f0ede8")
-  displayFont     String   @default("Syne")
-  monoFont        String   @default("Space Mono")
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id           String   @id @default(cuid())
+  primaryColor String   @default("hsl(348, 100%, 40%)")
+  primaryLight String   @default("hsl(348, 100%, 55%)")
+  primaryDim   String   @default("hsl(348, 60%, 25%)")
+  bgDark       String   @default("#0a0a0a")
+  bgDark2      String   @default("#111111")
+  bgDark3      String   @default("#1a1a1a")
+  bgDark4      String   @default("#222222")
+  textLight    String   @default("#f0ede8")
+  displayFont  String   @default("Syne")
+  monoFont     String   @default("Space Mono")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 }
 
 model ResumeRequest {
@@ -220,7 +220,6 @@ enum ResumeRequestStatus {
   DENIED
 }
 
-
 model SiteSettings {
   id               String   @id @default(cuid())
   footerTagline    String   @default("Software & Design Engineer based in Cape Town, South Africa.")
@@ -235,7 +234,6 @@ model SiteSettings {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }
-
 
 // ─── Client platform (Phase 4) ──────────────────────────────
 
@@ -274,24 +272,27 @@ model Client {
 }
 
 model ClientProject {
-  id            String           @id @default(cuid())
-  clientId      String
-  client        Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  title         String
-  description   String           @default("")
-  status        ProjectStatus    @default(QUOTED)
-  progress      Int              @default(0)
-  currency      String           @default("ZAR")
-  totalCents    Int              @default(0)
-  depositCents  Int              @default(0)
-  depositPaidAt DateTime?
-  finalPaidAt   DateTime?
-  startedAt     DateTime?
-  completedAt   DateTime?
-  cancelledAt   DateTime?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  updates       ProgressUpdate[]
+  id               String            @id @default(cuid())
+  clientId         String
+  client           Client            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  title            String
+  description      String            @default("")
+  status           ProjectStatus     @default(QUOTED)
+  progress         Int               @default(0)
+  currency         String            @default("ZAR")
+  totalCents       Int               @default(0)
+  depositCents     Int               @default(0)
+  depositPaidAt    DateTime?
+  finalPaidAt      DateTime?
+  startedAt        DateTime?
+  completedAt      DateTime?
+  cancelledAt      DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  updates          ProgressUpdate[]
+  workSessions     WorkSession[]
+  overtimeRequests OvertimeRequest[]
+  logEntries       WorkLogEntry[]
 
   @@index([clientId])
 }
@@ -333,4 +334,55 @@ model AuditLog {
 
   @@index([createdAt])
   @@index([actorType, actorId])
+}
+
+// ─── Work log & overtime (Phase 4, slice 2) ─────────────────
+
+enum OvertimeStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  CANCELLED
+}
+
+model WorkSession {
+  id                String        @id @default(cuid())
+  projectId         String
+  project           ClientProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  startedAt         DateTime
+  endedAt           DateTime?
+  summary           String        @default("")
+  overtime          Boolean       @default(false)
+  overtimeRequestId String?
+  createdAt         DateTime      @default(now())
+
+  @@index([projectId, startedAt])
+}
+
+model OvertimeRequest {
+  id               String         @id @default(cuid())
+  projectId        String
+  project          ClientProject  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  reason           String
+  estimatedMinutes Int
+  plannedFor       DateTime?
+  status           OvertimeStatus @default(PENDING)
+  clientNote       String         @default("")
+  decidedAt        DateTime?
+  createdAt        DateTime       @default(now())
+
+  @@index([projectId, createdAt])
+}
+
+model WorkLogEntry {
+  id              String        @id @default(cuid())
+  projectId       String
+  project         ClientProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  sessionId       String?
+  kind            String
+  message         String
+  visibleToClient Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+
+  @@index([projectId, createdAt])
 }

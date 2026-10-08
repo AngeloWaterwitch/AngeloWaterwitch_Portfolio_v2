@@ -5,6 +5,8 @@ import { requireAuth } from '@/lib/api-auth';
 import { sanitise } from '@/lib/sanitise';
 import { audit } from '@/lib/audit';
 import { clientIp } from '@/lib/ratelimit';
+import { logEvent } from '@/lib/worklog';
+import { PROJECT_STATUS_LABEL } from '@/lib/format';
 
 type Ctx = { params: Promise<{ id: string }> };
 
@@ -60,6 +62,18 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
 
   const project = await prisma.clientProject.update({ where: { id }, data });
   await audit('ADMIN', 'admin', 'project.update', { projectId: id, status: project.status }, clientIp(req));
+
+  // Automatic documentation: everything that changes on the project is written to its work log.
+  if (project.status !== current.status) {
+    await logEvent(id, 'STATUS', `Status changed from "${PROJECT_STATUS_LABEL[current.status]}" to "${PROJECT_STATUS_LABEL[project.status]}"`);
+  }
+  if (project.progress !== current.progress) await logEvent(id, 'PROGRESS', `Progress updated to ${project.progress}%`);
+  if (!!project.depositPaidAt !== !!current.depositPaidAt) {
+    await logEvent(id, 'PAYMENT', project.depositPaidAt ? 'Deposit marked as received' : 'Deposit marked as not received');
+  }
+  if (!!project.finalPaidAt !== !!current.finalPaidAt) {
+    await logEvent(id, 'PAYMENT', project.finalPaidAt ? 'Final payment marked as received' : 'Final payment marked as not received');
+  }
   return NextResponse.json(project);
 }
 
