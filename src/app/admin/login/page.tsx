@@ -38,7 +38,16 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
-   setError('Sign-in failed. Check your details, or wait a few minutes if you have tried several times.');
+      const code = (result as any).code as string | undefined;
+      if (code === 'throttled') {
+        setError('Too many attempts. Please wait 15 minutes and try again.');
+      } else if (code?.startsWith('captcha_')) {
+        setError('Security check (reCAPTCHA) failed: ' + code.slice(8) + '. If this says "invalid-input-response" or "browser-error", the site address is missing from your reCAPTCHA domain list, or the key pair is wrong.');
+      } else if (code === 'config') {
+        setError('Server setup problem: the admin email or password hash is missing or malformed in the environment variables.');
+      } else {
+        setError('Sign-in failed. Check your email and password.');
+      }
       setLoading(false);
     } else {
       router.push('/admin');

@@ -1,4 +1,4 @@
-import NextAuth from 'next-auth';
+import NextAuth, { CredentialsSignin } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
 import bcrypt from 'bcryptjs';
 import { timingSafeEqual } from 'node:crypto';
@@ -12,6 +12,14 @@ const loginSchema = z.object({
   password: z.string().min(1).max(200),
   recaptchaToken: z.string().optional(),
 });
+
+// Specific, non-sensitive failure reasons. These all happen BEFORE the password is checked,
+// so showing them does not reveal anything about the credentials.
+class ThrottledError extends CredentialsSignin { code = 'throttled'; }
+class CaptchaError extends CredentialsSignin {
+  constructor(reason: string) { super(); this.code = 'captcha_' + reason.replace(/[^a-z0-9-]/gi, '').slice(0, 40); }
+}
+class ConfigError extends CredentialsSignin { code = 'config'; }
 
 // Shared dummy hash so a wrong email costs the same time as a wrong password.
 const DUMMY_HASH = '$2b$12$y/Z4BITCYNZWdICcnOiJruPgzXqsWkzGIqUFRBIMj1sjWiTbZyeyq';
@@ -47,7 +55,7 @@ function safeEqual(a: string, b: string) {
 async function checkPassword(password: string): Promise<boolean> {
   const hash = process.env.ADMIN_PASSWORD_HASH;
   if (hash) {
-    if (!/^$2[aby]$d{2}$[./A-Za-z0-9]{53}$/.test(hash)) {
+    if (!/^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/.test(hash)) {
       console.error(
         `[auth] ADMIN_PASSWORD_HASH is malformed (length ${hash.length}, starts "${hash.slice(0, 4)}"). ` +
           'It must be 60 characters starting with $2b$12$ and contain no backslashes or spaces.',
@@ -95,7 +103,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             const { success } = await limiter.limit(`${clientIp(request)}:${email.toLowerCase()}`);
             if (!success) {
               console.warn('[auth] login throttled');
-              return null;
+              throw new ThrottledError();
             }
           } catch (err) {
             console.error('[auth] rate limiter unavailable:', (err as Error).message);
@@ -106,11 +114,17 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const captcha = await verifyRecaptcha(recaptchaToken, 'admin_login');
         if (!captcha.ok) {
           console.warn('[auth] reCAPTCHA failed:', captcha.reason);
-          return null;
+          throw new CaptchaError(captcha.reason ?? 'unknown');
         }
 
         // 3. Credentials (always run the password check to keep timing uniform).
         const adminEmail = (process.env.ADMIN_EMAIL ?? '').toLowerCase();
+        if (!adminEmail || (!process.env.ADMIN_PASSWORD_HASH && !process.env.ADMIN_PASSWORD)) {
+          console.error('[auth] ADMIN_EMAIL and ADMIN_PASSWORD_HASH must be set');
+          throw new ConfigError();
+        }
+        const hashEnv = process.env.ADMIN_PASSWORD_HASH;
+        if (hashEnv && !/^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/.test(hashEnv)) throw new ConfigError();
         const passwordOk = await checkPassword(password);
         const emailOk = adminEmail !== '' && safeEqual(email.toLowerCase(), adminEmail);
 
