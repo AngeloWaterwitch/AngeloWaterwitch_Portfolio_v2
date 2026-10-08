@@ -5,6 +5,7 @@ import { requireAuth } from '@/lib/api-auth';
 import { sanitise } from '@/lib/sanitise';
 import { audit } from '@/lib/audit';
 import { clientIp } from '@/lib/ratelimit';
+import { logEvent } from '@/lib/worklog';
 import { issueAccessCode, formatAccessCode, normaliseAccessCode, revokeClientAccess } from '@/lib/client-auth';
 
 type Ctx = { params: Promise<{ id: string }> };
@@ -90,6 +91,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
       await prisma.client.update({ where: { id }, data: { status: 'COMPLETED' } });
       await revokeClientAccess(id);
       await audit('ADMIN', 'admin', 'client.complete', { clientId: id }, ip);
+      for (const p of await prisma.clientProject.findMany({ where: { clientId: id }, select: { id: true } })) await logEvent(p.id, 'CONTRACT', 'The contract was marked as finished');
     }
 
     if (d.action === 'cancel') {
@@ -102,6 +104,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
       ]);
       await revokeClientAccess(id);
       await audit('ADMIN', 'admin', 'client.cancel', { clientId: id }, ip);
+      for (const p of await prisma.clientProject.findMany({ where: { clientId: id }, select: { id: true } })) await logEvent(p.id, 'CONTRACT', 'The contract was cancelled');
     }
 
     const client = await prisma.client.findUnique({ where: { id }, select: detailSelect });
