@@ -7,6 +7,8 @@ import { AdminField } from './components/AdminField';
 import { AdminGrid } from './components/AdminGrid';
 import { SaveButton } from './components/SaveButton';
 import { FileUpload } from './components/FileUpload';
+import { SectionsTab } from './components/SectionsTab';
+import { HeaderFooterTab } from './components/HeaderFooterTab';
 
 export default function AdminPage() {
   const [data, setData] = useState<any>(null);
@@ -57,6 +59,8 @@ export default function AdminPage() {
     { id: 'testimonials', label: 'Testimonials' },
     { id: 'contact', label: 'Contact' },
     { id: 'messages', label: unreadCount > 0 ? `Messages (${unreadCount})` : 'Messages' },
+    { id: 'sections', label: 'Sections & Nav' },
+    { id: 'headerfooter', label: 'Header & Footer' },
     { id: 'seo', label: 'SEO' },
     { id: 'branding', label: 'Branding' },
     { id: 'theme', label: 'Theme' },
@@ -190,6 +194,8 @@ export default function AdminPage() {
           {activeTab === 'testimonials' && <TestimonialsTab data={data} onRefetch={fetchData} />}
           {activeTab === 'contact' && <ContactTab data={data} onRefetch={fetchData} />}
           {activeTab === 'messages' && <MessagesTab onRefetch={fetchData} />}
+          {activeTab === 'sections' && <SectionsTab data={data} onRefetch={fetchData} />}
+          {activeTab === 'headerfooter' && <HeaderFooterTab data={data} onRefetch={fetchData} />}
           {activeTab === 'seo' && <SEOTab data={data} onRefetch={fetchData} />}
           {activeTab === 'branding' && <BrandingTab data={data} onRefetch={fetchData} />}
           {activeTab === 'theme' && <ThemeTab data={data} onRefetch={fetchData} />}

@@ -176,7 +176,7 @@ export default function Hero({ hero, resume }: any) {
           background: 'linear-gradient(to bottom, var(--cr-primary), transparent)',
           animation: 'scrollPulse 2s ease-in-out infinite',
         }} />
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: '#555', letterSpacing: '0.15em' }}>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--cr-muted)', letterSpacing: '0.15em' }}>
           SCROLL
         </span>
       </div>

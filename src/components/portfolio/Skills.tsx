@@ -2,18 +2,20 @@
  
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { DEFAULT_HEADINGS } from '@/lib/siteSettings';
  
-export default function Skills({ skills }: any) {
+export default function Skills({ skills, heading }: any) {
+  const h = heading ?? DEFAULT_HEADINGS.skills;
   return (
     <section id="skills" style={{ padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 3rem)', background: 'var(--cr-bg)' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
           style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--cr-light)', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '1rem' }}>
-          What I Use
+          {h.eyebrow}
         </motion.div>
         <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}
           style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.05, marginBottom: '1rem', color: 'var(--cr-text)' }}>
-          My <span style={{ color: 'var(--cr-light)' }}>Skills</span>
+          {h.lead} <span style={{ color: 'var(--cr-light)' }}>{h.highlight}</span>
         </motion.h2>
         <motion.div initial={{ opacity: 0, scaleX: 0 }} whileInView={{ opacity: 1, scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.2 }}
           style={{ width: '3rem', height: '2px', background: 'var(--cr-primary)', marginBottom: '3rem', transformOrigin: 'left' }} />

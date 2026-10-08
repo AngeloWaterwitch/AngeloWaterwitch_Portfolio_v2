@@ -2,8 +2,10 @@
  
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { DEFAULT_HEADINGS } from '@/lib/siteSettings';
  
-export default function Testimonials({ testimonials }: any) {
+export default function Testimonials({ testimonials, heading }: any) {
+  const h = heading ?? DEFAULT_HEADINGS.testimonials;
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({ author: '', role: '', quote: '' });
   const [submitted, setSubmitted] = useState(false);
@@ -29,12 +31,12 @@ export default function Testimonials({ testimonials }: any) {
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
           style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--cr-light)', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '1rem' }}>
-          Social Proof
+          {h.eyebrow}
         </motion.div>
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}
           style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-between', flexWrap: 'wrap', gap: '1rem', marginBottom: '1rem' }}>
           <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.05, color: 'var(--cr-text)' }}>
-            What Clients <span style={{ color: 'var(--cr-light)' }}>Say</span>
+            {h.lead} <span style={{ color: 'var(--cr-light)' }}>{h.highlight}</span>
           </h2>
           <button
             onClick={() => setShowForm(true)}
@@ -57,32 +59,32 @@ export default function Testimonials({ testimonials }: any) {
       {showForm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '2rem' }}>
           <div style={{ background: 'var(--cr-bg2)', border: '1px solid var(--cr-bg4)', borderRadius: '2px', padding: '2.5rem', width: '100%', maxWidth: '520px', position: 'relative' }}>
-            <button onClick={() => setShowForm(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'transparent', border: 'none', color: '#666', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
+            <button onClick={() => setShowForm(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'transparent', border: 'none', color: 'var(--cr-muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
             {submitted ? (
               <div style={{ textAlign: 'center', padding: '2rem 0' }}>
                 <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🎉</div>
                 <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--cr-text)' }}>Thank you!</p>
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: '#666', marginBottom: '1.5rem' }}>Your testimonial has been submitted for review.</p>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--cr-muted)', marginBottom: '1.5rem' }}>Your testimonial has been submitted for review.</p>
                 <button onClick={() => setShowForm(false)} style={{ padding: '0.7rem 1.5rem', background: 'var(--cr-primary)', color: '#fff', border: 'none', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.85rem', borderRadius: '1px', cursor: 'pointer' }}>Close</button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate>
                 <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--cr-light)', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '0.8rem' }}>Share Your Experience</div>
                 <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', fontWeight: 800, marginBottom: '0.5rem', color: 'var(--cr-text)' }}>Leave a <span style={{ color: 'var(--cr-light)' }}>Testimonial</span></h3>
-                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: '#666', marginBottom: '2rem', lineHeight: 1.6 }}>Your testimonial will be reviewed before appearing on the site.</p>
+                <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--cr-muted)', marginBottom: '2rem', lineHeight: 1.6 }}>Your testimonial will be reviewed before appearing on the site.</p>
                 {[
                   { label: 'Your Name *', name: 'author', placeholder: 'Jane Smith', error: errors.author },
                   { label: 'Your Role / Company', name: 'role', placeholder: 'CEO, Acme Corp', error: null },
                 ].map(field => (
                   <div key={field.name} style={{ marginBottom: '1.2rem' }}>
-                    <label style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: '#666', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>{field.label}</label>
+                    <label style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>{field.label}</label>
                     <input type="text" placeholder={field.placeholder} value={(form as any)[field.name]} onChange={e => setForm({ ...form, [field.name]: e.target.value })}
                       style={{ width: '100%', background: 'var(--cr-bg)', border: '1px solid ' + (field.error ? 'var(--cr-dim)' : 'var(--cr-bg4)'), color: 'var(--cr-text)', padding: '0.8rem 1rem', fontFamily: 'var(--font-display)', fontSize: '0.9rem', borderRadius: '1px', outline: 'none', boxSizing: 'border-box' }} />
                     {field.error && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--cr-light)', marginTop: '0.3rem' }}>{field.error}</div>}
                   </div>
                 ))}
                 <div style={{ marginBottom: '1.2rem' }}>
-                  <label style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: '#666', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Your Testimonial *</label>
+                  <label style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Your Testimonial *</label>
                   <textarea placeholder="Tell others about your experience..." value={form.quote} onChange={e => setForm({ ...form, quote: e.target.value })} rows={4}
                     style={{ width: '100%', background: 'var(--cr-bg)', border: '1px solid ' + (errors.quote ? 'var(--cr-dim)' : 'var(--cr-bg4)'), color: 'var(--cr-text)', padding: '0.8rem 1rem', fontFamily: 'var(--font-display)', fontSize: '0.9rem', borderRadius: '1px', outline: 'none', resize: 'vertical', minHeight: '100px', boxSizing: 'border-box' }} />
                   {errors.quote && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--cr-light)', marginTop: '0.3rem' }}>{errors.quote}</div>}
@@ -116,7 +118,7 @@ function TestimonialCard({ testimonial, index }: any) {
         </div>
         <div>
           <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(0.8rem, 2vw, 0.9rem)', color: 'var(--cr-text)' }}>{testimonial.author}</div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.62rem, 1.5vw, 0.7rem)', color: '#666', marginTop: '0.2rem', letterSpacing: '0.05em' }}>{testimonial.role}</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.62rem, 1.5vw, 0.7rem)', color: 'var(--cr-muted)', marginTop: '0.2rem', letterSpacing: '0.05em' }}>{testimonial.role}</div>
         </div>
       </div>
     </motion.div>

@@ -3,8 +3,10 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { getRecaptchaToken } from '@/lib/recaptcha-client';
+import { DEFAULT_HEADINGS } from '@/lib/siteSettings';
  
-export default function Contact({ contact }: any) {
+export default function Contact({ contact, heading }: any) {
+  const h = heading ?? DEFAULT_HEADINGS.contact;
   const [form, setForm] = useState({ name: '', email: '', message: '', honeypot: '' });
   const [status, setStatus] = useState<string | null>(null);
   const [errors, setErrors] = useState<any>({});
@@ -58,17 +60,17 @@ export default function Contact({ contact }: any) {
         <div>
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
             style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--cr-light)', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '1rem' }}>
-            Say Hello
+            {h.eyebrow}
           </motion.div>
           <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}
             style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.05, marginBottom: '1rem', color: 'var(--cr-text)' }}>
-            Get In <span style={{ color: 'var(--cr-light)' }}>Touch</span>
+            {h.lead} <span style={{ color: 'var(--cr-light)' }}>{h.highlight}</span>
           </motion.h2>
           <motion.div initial={{ opacity: 0, scaleX: 0 }} whileInView={{ opacity: 1, scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.2 }}
             style={{ width: '3rem', height: '2px', background: 'var(--cr-primary)', marginBottom: '2.5rem', transformOrigin: 'left' }} />
           {contactItems.map((item, i) => (
             <motion.div key={i} initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }} style={{ marginBottom: '1.5rem' }}>
-              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: '#555', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.3rem' }}>{item.label}</div>
+              <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--cr-muted)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.3rem' }}>{item.label}</div>
               {item.href ? (
                 <a href={item.href} style={{ fontSize: 'clamp(0.85rem, 2vw, 1rem)', color: 'var(--cr-light)', textDecoration: 'underline', textDecorationColor: 'var(--cr-dim)', wordBreak: 'break-all' }}>{item.value}</a>
               ) : (
@@ -97,27 +99,27 @@ export default function Contact({ contact }: any) {
               <input type="text" name="honeypot" value={form.honeypot} onChange={e => setForm({ ...form, honeypot: e.target.value })} tabIndex={-1} autoComplete="off" />
             </div>
             {[
-              { label: 'Name', name: 'name', type: 'text', placeholder: 'Your name', error: errors.name },
-              { label: 'Email', name: 'email', type: 'email', placeholder: 'your@email.com', error: errors.email },
+              { label: 'Name', name: 'name', type: 'text', placeholder: 'Your name', autoComplete: 'name', error: errors.name },
+              { label: 'Email', name: 'email', type: 'email', placeholder: 'your@email.com', autoComplete: 'email', error: errors.email },
             ].map(field => (
               <div key={field.name} style={{ marginBottom: '1.2rem' }}>
-                <label style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: field.error ? 'var(--cr-light)' : '#666', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>{field.label}</label>
-                <input type={field.type} placeholder={field.placeholder} value={(form as any)[field.name]} onChange={e => setForm({ ...form, [field.name]: e.target.value })}
+                <label htmlFor={'contact-' + field.name} style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: field.error ? 'var(--cr-light)' : 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>{field.label}</label>
+                <input id={'contact-' + field.name} name={field.name} type={field.type} autoComplete={field.autoComplete} aria-invalid={!!field.error} aria-describedby={field.error ? 'contact-' + field.name + '-error' : undefined} placeholder={field.placeholder} value={(form as any)[field.name]} onChange={e => setForm({ ...form, [field.name]: e.target.value })}
                   style={{ width: '100%', background: 'var(--cr-bg)', border: '1px solid ' + (field.error ? 'var(--cr-dim)' : '#222'), color: 'var(--cr-text)', padding: '0.8rem 1rem', fontFamily: 'var(--font-display)', fontSize: 'clamp(0.85rem, 2vw, 0.9rem)', borderRadius: '1px', outline: 'none', boxSizing: 'border-box' }} />
-                {field.error && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--cr-light)', marginTop: '0.3rem' }}>{field.error}</div>}
+                {field.error && <div id={'contact-' + field.name + '-error'} role="alert" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--cr-light)', marginTop: '0.3rem' }}>{field.error}</div>}
               </div>
             ))}
             <div style={{ marginBottom: '1.2rem' }}>
-              <label style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: errors.message ? 'var(--cr-light)' : '#666', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Message</label>
-              <textarea placeholder="Tell me about your project..." value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} rows={5}
+              <label htmlFor="contact-message" style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: errors.message ? 'var(--cr-light)' : 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Message</label>
+              <textarea id="contact-message" name="message" aria-invalid={!!errors.message} aria-describedby={errors.message ? 'contact-message-error' : undefined} placeholder="Tell me about your project..." value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} rows={5}
                 style={{ width: '100%', background: 'var(--cr-bg)', border: '1px solid ' + (errors.message ? 'var(--cr-dim)' : '#222'), color: 'var(--cr-text)', padding: '0.8rem 1rem', fontFamily: 'var(--font-display)', fontSize: 'clamp(0.85rem, 2vw, 0.9rem)', borderRadius: '1px', outline: 'none', resize: 'vertical', minHeight: '120px', boxSizing: 'border-box' }} />
-              {errors.message && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--cr-light)', marginTop: '0.3rem' }}>{errors.message}</div>}
+              {errors.message && <div id="contact-message-error" role="alert" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--cr-light)', marginTop: '0.3rem' }}>{errors.message}</div>}
             </div>
             <button type="submit" disabled={status === 'sending'}
               style={{ width: '100%', padding: '1rem', background: status === 'sending' ? '#333' : 'var(--cr-primary)', color: '#fff', border: 'none', fontFamily: 'var(--font-display)', fontSize: 'clamp(0.8rem, 2vw, 0.85rem)', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', borderRadius: '1px', cursor: status === 'sending' ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}>
               {status === 'sending' ? 'Sending...' : 'Send Message'}
             </button>
-            {status === 'success' && <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: '#4caf50', marginTop: '1rem', textAlign: 'center' }}>✓ Message sent! I'll be in touch soon.</p>}
+            {status === 'success' && <p role="status" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: '#4caf50', marginTop: '1rem', textAlign: 'center' }}>✓ Message sent! I'll be in touch soon.</p>}
             {status === 'error' && <p role="alert" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--cr-light)', marginTop: '1rem', textAlign: 'center' }}>✕ Something went wrong. Please try again.</p>}
           </form>
         </motion.div>

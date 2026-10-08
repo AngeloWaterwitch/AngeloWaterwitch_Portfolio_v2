@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { resolveSettings } from '@/lib/siteSettings';
 
 async function loadSiteData() {
   const [
@@ -15,6 +16,7 @@ async function loadSiteData() {
     sections,
     resume,
     theme,
+    settingsRow,
   ] = await Promise.all([
     prisma.heroContent.findFirst(),
     prisma.aboutContent.findFirst(),
@@ -35,6 +37,8 @@ async function loadSiteData() {
     prisma.siteSection.findMany({ orderBy: { order: 'asc' } }),
     prisma.resumeFile.findFirst({ where: { enabled: true } }),
     prisma.themeSettings.findFirst(),
+    // Tolerate the table not existing yet (deploy before migration) without taking the site down.
+    prisma.siteSettings.findFirst().catch(() => null),
   ]);
 
   return {
@@ -51,6 +55,7 @@ async function loadSiteData() {
     sections,
     resume,
     theme,
+    settings: resolveSettings(settingsRow),
   };
 }
 
@@ -88,6 +93,7 @@ function fallbackSiteData() {
     ],
     resume: null,
     theme: null,
+    settings: resolveSettings(null),
   };
 }
 

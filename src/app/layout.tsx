@@ -32,12 +32,15 @@ export default async function RootLayout({
       --cr-bg3:       ${theme?.bgDark3       ?? '#1a1a1a'};
       --cr-bg4:       ${theme?.bgDark4       ?? '#222222'};
       --cr-text:      ${theme?.textLight     ?? '#f0ede8'};
+      --cr-muted:     #9a9a9a;
     }
   `;
 
   return (
     <html lang="en">
       <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
           href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@400;600;700;800&family=Raleway:wght@400;500;600;700;800&family=Oswald:wght@400;500;600;700&family=Fira+Code:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
           rel="stylesheet"

@@ -2,8 +2,10 @@
  
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState } from 'react';
+import { DEFAULT_HEADINGS } from '@/lib/siteSettings';
  
-export default function Projects({ projects }: any) {
+export default function Projects({ projects, heading }: any) {
+  const h = heading ?? DEFAULT_HEADINGS.projects;
   const [selected, setSelected] = useState<any>(null);
  
   return (
@@ -11,11 +13,11 @@ export default function Projects({ projects }: any) {
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
           style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--cr-light)', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '1rem' }}>
-          My Work
+          {h.eyebrow}
         </motion.div>
         <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}
           style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.05, marginBottom: '1rem', color: 'var(--cr-text)' }}>
-          Featured <span style={{ color: 'var(--cr-light)' }}>Projects</span>
+          {h.lead} <span style={{ color: 'var(--cr-light)' }}>{h.highlight}</span>
         </motion.h2>
         <motion.div initial={{ opacity: 0, scaleX: 0 }} whileInView={{ opacity: 1, scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.2 }}
           style={{ width: '3rem', height: '2px', background: 'var(--cr-primary)', marginBottom: '3rem', transformOrigin: 'left' }} />
@@ -66,7 +68,7 @@ function ProjectCard({ project, index, onClick }: any) {
       </div>
       <div style={{ padding: 'clamp(1rem, 3vw, 1.5rem)' }}>
         <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1rem, 3vw, 1.2rem)', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--cr-text)' }}>{project.title}</h3>
-        <p style={{ fontSize: 'clamp(0.8rem, 2vw, 0.9rem)', color: '#777', lineHeight: 1.6, marginBottom: '1rem' }}>{project.desc}</p>
+        <p style={{ fontSize: 'clamp(0.8rem, 2vw, 0.9rem)', color: 'var(--cr-muted)', lineHeight: 1.6, marginBottom: '1rem' }}>{project.desc}</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
           {project.tags?.map((tag: string, i: number) => (
             <span key={i} style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.6rem, 1.5vw, 0.65rem)', color: 'var(--cr-light)', border: '1px solid var(--cr-dim)', padding: '0.2rem 0.5rem', borderRadius: '1px' }}>{tag}</span>

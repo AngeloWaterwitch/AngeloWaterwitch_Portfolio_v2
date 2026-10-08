@@ -219,3 +219,19 @@ enum ResumeRequestStatus {
   APPROVED
   DENIED
 }
+
+
+model SiteSettings {
+  id               String   @id @default(cuid())
+  footerTagline    String   @default("Software & Design Engineer based in Cape Town, South Africa.")
+  footerCopyright  String   @default("Angelo Waterwitch")
+  footerCredit     String   @default("Designed & Built by Angelo Waterwitch")
+  showFooterCredit Boolean  @default(true)
+  showAdminLink    Boolean  @default(false)
+  navCtaLabel      String?
+  navCtaUrl        String?
+  legalLinks       Json     @default("[]")
+  sectionHeadings  Json     @default("{}")
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
