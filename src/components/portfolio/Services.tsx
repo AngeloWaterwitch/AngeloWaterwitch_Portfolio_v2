@@ -2,18 +2,20 @@
  
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { DEFAULT_HEADINGS } from '@/lib/siteSettings';
  
-export default function Services({ services }: any) {
+export default function Services({ services, heading }: any) {
+  const h = heading ?? DEFAULT_HEADINGS.services;
   return (
     <section id="services" style={{ padding: 'clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 3rem)', background: 'var(--cr-bg)' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
           style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--cr-light)', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '1rem' }}>
-          What I Offer
+          {h.eyebrow}
         </motion.div>
         <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}
           style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.05, marginBottom: '1rem', color: 'var(--cr-text)' }}>
-          My <span style={{ color: 'var(--cr-light)' }}>Services</span>
+          {h.lead} <span style={{ color: 'var(--cr-light)' }}>{h.highlight}</span>
         </motion.h2>
         <motion.div initial={{ opacity: 0, scaleX: 0 }} whileInView={{ opacity: 1, scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.2 }}
           style={{ width: '3rem', height: '2px', background: 'var(--cr-primary)', marginBottom: '3rem', transformOrigin: 'left' }} />
@@ -44,7 +46,7 @@ function ServiceItem({ service, index, total }: any) {
       <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '2px', background: 'var(--cr-primary)', transform: hovered ? 'scaleX(1)' : 'scaleX(0)', transformOrigin: 'left', transition: 'transform 0.3s ease' }} />
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--cr-primary)', letterSpacing: '0.1em', marginBottom: '1.2rem' }}>{service.num}</div>
       <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.1rem, 3vw, 1.4rem)', fontWeight: 700, color: hovered ? 'var(--cr-light)' : 'var(--cr-text)', marginBottom: '1rem', transition: 'color 0.2s' }}>{service.title}</h3>
-      <p style={{ fontSize: 'clamp(0.85rem, 2vw, 0.9rem)', color: '#777', lineHeight: 1.7 }}>{service.desc}</p>
+      <p style={{ fontSize: 'clamp(0.85rem, 2vw, 0.9rem)', color: 'var(--cr-muted)', lineHeight: 1.7 }}>{service.desc}</p>
     </motion.div>
   );
 }

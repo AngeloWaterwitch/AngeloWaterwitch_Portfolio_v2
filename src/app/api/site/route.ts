@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { resolveSettings } from '@/lib/siteSettings';
 
 function decode(str: string | null | undefined): string {
   if (!str) return str as any;
@@ -35,7 +36,7 @@ export async function GET() {
   try {
     const [
       hero, about, skills, projects, services, timeline,
-      testimonials, contact, seo, branding, sections, resume, theme,
+      testimonials, contact, seo, branding, sections, resume, theme, settingsRow,
     ] = await Promise.all([
       prisma.heroContent.findFirst(),
       prisma.aboutContent.findFirst(),
@@ -50,6 +51,7 @@ export async function GET() {
       prisma.siteSection.findMany({ orderBy: { order: 'asc' } }),
       prisma.resumeFile.findFirst({ where: { enabled: true } }),
       prisma.themeSettings.findFirst(),
+      prisma.siteSettings.findFirst().catch(() => null),
     ]);
 
     return NextResponse.json({
@@ -66,6 +68,7 @@ export async function GET() {
       sections: sections.map(decodeObj),
       resume: decodeObj(resume),
       theme: decodeObj(theme),
+      settings: resolveSettings(settingsRow),
     });
   } catch (error) {
     return NextResponse.json({ error: 'Failed to fetch site data' }, { status: 500 });

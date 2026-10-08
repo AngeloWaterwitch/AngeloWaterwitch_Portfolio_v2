@@ -2,8 +2,10 @@
  
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { DEFAULT_HEADINGS } from '@/lib/siteSettings';
  
-export default function Timeline({ timeline }: any) {
+export default function Timeline({ timeline, heading }: any) {
+  const h = heading ?? DEFAULT_HEADINGS.timeline;
   const education = timeline?.filter((t: any) => t.type === 'education') || [];
   const work = timeline?.filter((t: any) => t.type === 'work') || [];
  
@@ -12,11 +14,11 @@ export default function Timeline({ timeline }: any) {
       <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5 }}
           style={{ fontFamily: 'var(--font-mono)', fontSize: '0.75rem', color: 'var(--cr-light)', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: '1rem' }}>
-          My Journey
+          {h.eyebrow}
         </motion.div>
         <motion.h2 initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.5, delay: 0.1 }}
           style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem, 5vw, 3.5rem)', fontWeight: 800, lineHeight: 1.05, marginBottom: '1rem', color: 'var(--cr-text)' }}>
-          Experience & <span style={{ color: 'var(--cr-light)' }}>Education</span>
+          {h.lead} <span style={{ color: 'var(--cr-light)' }}>{h.highlight}</span>
         </motion.h2>
         <motion.div initial={{ opacity: 0, scaleX: 0 }} whileInView={{ opacity: 1, scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.2 }}
           style={{ width: '3rem', height: '2px', background: 'var(--cr-primary)', marginBottom: '4rem', transformOrigin: 'left' }} />
@@ -65,7 +67,7 @@ function TimelineItem({ item, index }: any) {
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--cr-light)', letterSpacing: '0.1em', marginBottom: '0.6rem', display: 'inline-block', background: 'var(--cr-dim)', padding: '0.2rem 0.6rem', borderRadius: '1px' }}>{item.period}</div>
         <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)', fontWeight: 700, color: 'var(--cr-text)', marginBottom: '0.3rem' }}>{item.title}</h3>
         <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.65rem, 1.5vw, 0.72rem)', color: 'var(--cr-light)', letterSpacing: '0.08em', marginBottom: '0.8rem' }}>{item.organisation}</div>
-        <p style={{ fontSize: 'clamp(0.82rem, 2vw, 0.88rem)', color: '#777', lineHeight: 1.7 }}>{item.desc}</p>
+        <p style={{ fontSize: 'clamp(0.82rem, 2vw, 0.88rem)', color: 'var(--cr-muted)', lineHeight: 1.7 }}>{item.desc}</p>
       </div>
     </motion.div>
   );

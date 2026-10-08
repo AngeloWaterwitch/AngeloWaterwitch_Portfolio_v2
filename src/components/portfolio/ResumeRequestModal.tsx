@@ -146,7 +146,7 @@ export default function ResumeRequestModal({ resumeLabel, onClose }: Props) {
               }}>
                 Request CV Access
               </h3>
-              <p style={{ color: '#666', fontSize: '0.82rem', marginBottom: '1.75rem', lineHeight: 1.6 }}>
+              <p style={{ color: 'var(--cr-muted)', fontSize: '0.82rem', marginBottom: '1.75rem', lineHeight: 1.6 }}>
                 Fill in your details and Angelo will email you a secure download link.
               </p>
 
@@ -176,7 +176,7 @@ export default function ResumeRequestModal({ resumeLabel, onClose }: Props) {
                     style={{
                       padding: '0.65rem 1.2rem',
                       background: 'transparent',
-                      color: '#666',
+                      color: 'var(--cr-muted)',
                       border: '1px solid #333',
                       borderRadius: '2px',
                       fontFamily: 'var(--font-display)',
@@ -210,7 +210,7 @@ export default function ResumeRequestModal({ resumeLabel, onClose }: Props) {
                   </button>
                 </div>
 
-                <p style={{ color: '#444', fontSize: '0.72rem', textAlign: 'center' }}>
+                <p style={{ color: 'var(--cr-muted)', fontSize: '0.72rem', textAlign: 'center' }}>
                   Protected by reCAPTCHA
                 </p>
               </div>
