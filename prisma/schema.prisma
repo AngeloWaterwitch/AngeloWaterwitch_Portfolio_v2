@@ -235,3 +235,102 @@ model SiteSettings {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 }
+
+
+// ─── Client platform (Phase 4) ──────────────────────────────
+
+enum ClientStatus {
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum ProjectStatus {
+  QUOTED
+  DEPOSIT_PENDING
+  IN_PROGRESS
+  IN_REVIEW
+  COMPLETED
+  CANCELLED
+}
+
+model Client {
+  id             String          @id @default(cuid())
+  name           String
+  email          String
+  phone          String?
+  company        String?
+  status         ClientStatus    @default(ACTIVE)
+  // The access code is never stored. Only a keyed hash (for lookup) and the last 4 characters (so you can tell codes apart).
+  accessCodeHash String          @unique
+  accessCodeHint String
+  codeIssuedAt   DateTime        @default(now())
+  codeExpiresAt  DateTime?
+  lastLoginAt    DateTime?
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  projects       ClientProject[]
+  sessions       ClientSession[]
+}
+
+model ClientProject {
+  id            String           @id @default(cuid())
+  clientId      String
+  client        Client           @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  title         String
+  description   String           @default("")
+  status        ProjectStatus    @default(QUOTED)
+  progress      Int              @default(0)
+  currency      String           @default("ZAR")
+  totalCents    Int              @default(0)
+  depositCents  Int              @default(0)
+  depositPaidAt DateTime?
+  finalPaidAt   DateTime?
+  startedAt     DateTime?
+  completedAt   DateTime?
+  cancelledAt   DateTime?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  updates       ProgressUpdate[]
+
+  @@index([clientId])
+}
+
+model ProgressUpdate {
+  id              String        @id @default(cuid())
+  projectId       String
+  project         ClientProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  title           String
+  body            String        @default("")
+  progress        Int?
+  visibleToClient Boolean       @default(true)
+  createdAt       DateTime      @default(now())
+
+  @@index([projectId, createdAt])
+}
+
+model ClientSession {
+  id        String   @id @default(cuid())
+  clientId  String
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  tokenHash String   @unique
+  expiresAt DateTime
+  ip        String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([clientId])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actorType String
+  actorId   String?
+  action    String
+  detail    Json?
+  ip        String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([actorType, actorId])
+}
