@@ -2,6 +2,7 @@
  
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import { getRecaptchaToken } from '@/lib/recaptcha-client';
  
 export default function Contact({ contact }: any) {
   const [form, setForm] = useState({ name: '', email: '', message: '', honeypot: '' });
@@ -18,10 +19,17 @@ export default function Contact({ contact }: any) {
     if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
     setErrors({});
     setStatus('sending');
+    let recaptchaToken = '';
+    try {
+      recaptchaToken = await getRecaptchaToken('contact');
+    } catch {
+      setStatus('error');
+      return;
+    }
     const res = await fetch('/api/contact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form),
+      body: JSON.stringify({ ...form, recaptchaToken }),
     });
     if (res.ok) {
       setStatus('success');
@@ -110,7 +118,7 @@ export default function Contact({ contact }: any) {
               {status === 'sending' ? 'Sending...' : 'Send Message'}
             </button>
             {status === 'success' && <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: '#4caf50', marginTop: '1rem', textAlign: 'center' }}>✓ Message sent! I'll be in touch soon.</p>}
-            {status === 'error' && <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--cr-light)', marginTop: '1rem', textAlign: 'center' }}>✕ Something went wrong. Please try again.</p>}
+            {status === 'error' && <p role="alert" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--cr-light)', marginTop: '1rem', textAlign: 'center' }}>✕ Something went wrong. Please try again.</p>}
           </form>
         </motion.div>
       </div>

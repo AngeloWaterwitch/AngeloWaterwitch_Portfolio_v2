@@ -1,7 +1,8 @@
 'use client';
-import { useState } from 'react';
-import { signIn } from 'next-auth/react';
+import { useEffect, useState } from 'react';
+import { signIn, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { getRecaptchaToken } from '@/lib/recaptcha-client';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -10,22 +11,47 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
+  // Opening the admin always asks for credentials: drop any previous session.
+  useEffect(() => {
+    signOut({ redirect: false }).catch(() => {});
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
+    let recaptchaToken = '';
+    try {
+      recaptchaToken = await getRecaptchaToken('admin_login');
+    } catch {
+      setError('Could not reach the security check (reCAPTCHA). Check your internet connection, disable ad-blockers or VPN for this site, then try again.');
+      setLoading(false);
+      return;
+    }
+
     const result = await signIn('credentials', {
       email,
       password,
+      recaptchaToken,
       redirect: false,
     });
 
     if (result?.error) {
-      setError('Invalid email or password');
+      const code = (result as any).code as string | undefined;
+      if (code === 'throttled') {
+        setError('Too many attempts. Please wait 15 minutes and try again.');
+      } else if (code?.startsWith('captcha_')) {
+        setError('Security check (reCAPTCHA) failed: ' + code.slice(8) + '. If this says "invalid-input-response" or "browser-error", the site address is missing from your reCAPTCHA domain list, or the key pair is wrong.');
+      } else if (code === 'config') {
+        setError('Server setup problem: the admin email or password hash is missing or malformed in the environment variables.');
+      } else {
+        setError('Sign-in failed. Check your email and password.');
+      }
       setLoading(false);
     } else {
       router.push('/admin');
+      router.refresh();
     }
   };
 
@@ -81,6 +107,7 @@ export default function LoginPage() {
             </label>
             <input
               type="email"
+              autoComplete="username"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="your@email.com"
@@ -113,6 +140,7 @@ export default function LoginPage() {
             </label>
             <input
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="••••••••"
