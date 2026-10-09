@@ -31,6 +31,8 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Identifies this build so open pages can tell when a newer one has been deployed.
+  env: { NEXT_PUBLIC_BUILD_ID: process.env.VERCEL_GIT_COMMIT_SHA || String(Date.now()) },
   async headers() {
     return [
       { source: '/:path*', headers: securityHeaders },
