@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import NewVersionBanner from '@/components/NewVersionBanner';
 
 export const metadata: Metadata = {
   title: 'Client Portal — Angelo Waterwitch',
@@ -17,6 +18,7 @@ export default function ClientLayout({ children }: { children: React.ReactNode }
         @media (prefers-reduced-motion: reduce) { * { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; } }
       `}</style>
       {children}
+      <NewVersionBanner />
     </div>
   );
 }

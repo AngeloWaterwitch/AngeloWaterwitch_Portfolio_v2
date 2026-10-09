@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import NewVersionBanner from '@/components/NewVersionBanner';
 
 export const metadata: Metadata = {
   title: 'Admin — Angelo Waterwitch',
@@ -16,6 +17,7 @@ export default function AdminLayout({
         rel="stylesheet"
       />
       {children}
+      <NewVersionBanner />
     </>
   );
 }
