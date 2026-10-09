@@ -7,6 +7,7 @@ import { AdminGrid } from './AdminGrid';
 import { AdminToggle } from './AdminToggle';
 import { WorkPanel } from './WorkPanel';
 import { AdminChat } from './AdminChat';
+import CallErrorBoundary from '@/components/chat/CallErrorBoundary';
 import type { AdminSummary } from './AdminCallListener';
 import { PROJECT_STATUS_LABEL, formatDate, formatDateTime } from '@/lib/format';
 
@@ -218,7 +219,7 @@ function ClientDetail({ id, onBack, onCode, run, summary }: { summary: AdminSumm
       </div>
 
       <AdminLabel>Chat</AdminLabel>
-      <AdminChat clientId={id} clientName={client.name} channel={summary?.channel ?? null} callsEnabled={!!summary?.callsEnabled} closed={!active} />
+      <CallErrorBoundary label="The chat"><AdminChat clientId={id} clientName={client.name} channel={summary?.channel ?? null} callsEnabled={!!summary?.callsEnabled} closed={!active} /></CallErrorBoundary>
       {summary && !summary.callsEnabled && (
         <p style={{ ...mono, fontSize: '0.68rem', color: '#777', marginTop: '0.6rem', lineHeight: 1.6 }}>Voice and video calls are switched off until the LiveKit settings are added (see the setup notes).</p>
       )}

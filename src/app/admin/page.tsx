@@ -11,6 +11,7 @@ import { SectionsTab } from './components/SectionsTab';
 import { HeaderFooterTab } from './components/HeaderFooterTab';
 import { ClientsTab } from './components/ClientsTab';
 import { AdminCallListener, type AdminSummary } from './components/AdminCallListener';
+import CallErrorBoundary from '@/components/chat/CallErrorBoundary';
 
 export default function AdminPage() {
   const [data, setData] = useState<any>(null);
@@ -73,7 +74,9 @@ export default function AdminPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a0a' }}>
-      <AdminCallListener onSummary={setChatSummary} />
+      <CallErrorBoundary label="Incoming calls">
+        <AdminCallListener onSummary={setChatSummary} />
+      </CallErrorBoundary>
 
       {/* Header */}
       <div style={{

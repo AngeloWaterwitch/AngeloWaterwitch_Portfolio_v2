@@ -58,16 +58,19 @@ export default function ChatPanel(props: {
   const mine = role;
 
   const loading = useRef(false);
+  // Bumped on every call action (answer/decline/hang up). A poll that started before the action is stale and must not undo it.
+  const callSeq = useRef(0);
   const load = useCallback(async () => {
     if (loading.current) return; // never stack polls when the network is slow
     loading.current = true;
+    const seqAtStart = callSeq.current;
     try {
       const res = await api.list(lastAt.current ?? undefined);
       if (!res.ok) return;
       const json = await res.json();
       if (json.channel) setChannel((c) => c ?? json.channel);
       if (typeof json.callsEnabled === 'boolean') setCallsEnabled(json.callsEnabled);
-      setCall(json.call ?? null);
+      if (seqAtStart === callSeq.current) setCall(json.call ?? null);
       const incoming: Msg[] = json.messages ?? [];
       if (incoming.length) {
         setMessages((prev) => {
@@ -78,7 +81,7 @@ export default function ChatPanel(props: {
         lastAt.current = incoming[incoming.length - 1].createdAt;
       }
       // The server says there is no live call any more: the other side declined, cancelled or hung up.
-      if (!json.call && overlayRef.current) setOverlay(null);
+      if (seqAtStart === callSeq.current && !json.call && overlayRef.current) setOverlay(null);
     } catch { /* offline: keep what we have */ } finally { loading.current = false; }
     setLoaded(true);
   }, [api]);
@@ -147,12 +150,21 @@ export default function ChatPanel(props: {
     setOverlay({ callId: json.callId, url: json.url, token: json.token, kind: json.kind });
   };
   const startCall = async (kind: 'AUDIO' | 'VIDEO') => { setError(''); try { await join(await api.startCall(kind)); } catch { setError('No connection. Please try again.'); } };
-  const answer = async () => { if (call) { setError(''); try { await join(await api.callAction(call.id, 'accept')); } catch { setError('No connection.'); } } };
-  const decline = async () => { if (call) { await api.callAction(call.id, 'decline').catch(() => {}); load(); } };
+  const answer = async () => { if (call) { setError(''); callSeq.current++; try { await join(await api.callAction(call.id, 'accept')); } catch { setError('No connection.'); } } };
+  const decline = async () => {
+    if (!call) return;
+    callSeq.current++;
+    const id = call.id;
+    setCall(null); // the ring stops at once; the server confirms in the background
+    await api.callAction(id, 'decline').catch(() => {});
+    load();
+  };
   const rejoin = async () => { if (call) { setError(''); try { await join(await api.callAction(call.id, 'token')); } catch { setError('No connection.'); } } };
   const endCall = async () => {
     const id = overlay?.callId;
+    callSeq.current++;
     setOverlay(null);
+    setCall(null);
     if (id) await api.callAction(id, 'end').catch(() => {});
     load();
   };
@@ -186,7 +198,7 @@ export default function ChatPanel(props: {
           <span style={{ fontSize: '0.85rem' }}>{call.status === 'ACTIVE' ? 'A call is in progress.' : 'Your call is still ringing...'}</span>
           <span style={{ display: 'flex', gap: '0.4rem' }}>
             <button type="button" onClick={rejoin} style={btn('#2e7d32')}>Rejoin</button>
-            <button type="button" onClick={async () => { await api.callAction(call.id, 'end').catch(() => {}); load(); }} style={btn('#7a1020')}>End</button>
+            <button type="button" onClick={async () => { const id = call.id; callSeq.current++; setCall(null); await api.callAction(id, 'end').catch(() => {}); load(); }} style={btn('#7a1020')}>End</button>
           </span>
         </div>
       )}

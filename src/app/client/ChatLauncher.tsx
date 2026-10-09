@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ChatPanel, { type ChatApi } from '@/components/chat/ChatPanel';
+import CallErrorBoundary from '@/components/chat/CallErrorBoundary';
 
 const SEEN_KEY = 'aw_chat_seen';
 const json = { 'Content-Type': 'application/json' };
@@ -50,6 +51,7 @@ export default function ChatLauncher() {
           boxShadow: '0 10px 40px rgba(0,0,0,0.6)',
         }}
       >
+        <CallErrorBoundary>
         <ChatPanel
           api={api}
           role="CLIENT"
@@ -59,6 +61,7 @@ export default function ChatLauncher() {
           onMessages={onMessages}
           onIncomingCall={() => { setOpen(true); markSeen(); }}
         />
+        </CallErrorBoundary>
       </div>
 
       <button

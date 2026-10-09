@@ -37,19 +37,21 @@ export function AdminCallListener({ onSummary }: { onSummary: (s: AdminSummary) 
   onSummaryRef.current = onSummary;
 
   const busy = useRef(false);
+  // Bumped on every call action. A poll that started before the action is stale and must not undo it.
+  const seq = useRef(0);
   const refresh = useCallback(async () => {
     if (busy.current) return; // never stack polls when the network is slow
     busy.current = true;
+    const seqAtStart = seq.current;
     try {
       const res = await fetch('/api/admin/chat/summary', { cache: 'no-store' });
       if (!res.ok) return;
       const s = await res.json();
       setChannel((c) => c ?? s.channel);
-      setIncoming(s.incoming ?? []);
-      setLive(s.live ?? []);
+      if (seqAtStart === seq.current) { setIncoming(s.incoming ?? []); setLive(s.live ?? []); }
       onSummaryRef.current({ channel: s.channel, callsEnabled: s.callsEnabled, unread: s.unread ?? {}, totalUnread: s.totalUnread ?? 0 });
       // The call ended on the other side (declined, hung up): close our call screen.
-      if (overlayRef.current && !(s.live ?? []).some((c: Live) => c.id === overlayRef.current!.callId)) setOverlay(null);
+      if (seqAtStart === seq.current && overlayRef.current && !(s.live ?? []).some((c: Live) => c.id === overlayRef.current!.callId)) setOverlay(null);
     } catch { /* offline: try again on the next poll */ } finally { busy.current = false; }
   }, []);
 
@@ -90,7 +92,9 @@ export function AdminCallListener({ onSummary }: { onSummary: (s: AdminSummary) 
 
   const end = async () => {
     const id = overlay?.callId;
+    seq.current++;
     setOverlay(null);
+    setLive((l) => l.filter((c) => c.id !== id));
     if (id) await act(id, 'end').catch(() => {});
     refresh();
   };
@@ -101,22 +105,22 @@ export function AdminCallListener({ onSummary }: { onSummary: (s: AdminSummary) 
   return (
     <>
       {ringing && first && (
-        <div role="alertdialog" aria-label={`Incoming call from ${first.clientName}`} style={{ position: 'fixed', top: '1rem', right: '1rem', zIndex: 2500, width: 'min(360px, calc(100vw - 2rem))', background: '#17171c', border: '1px solid rgba(76,175,80,0.6)', boxShadow: '0 10px 40px rgba(0,0,0,0.7)', padding: '1rem 1.1rem', color: '#f0ede8', fontFamily: "'Syne', sans-serif" }}>
+        <div role="alertdialog" aria-label={`Incoming call from ${first.clientName}`} style={{ position: 'fixed', top: '1rem', left: '1rem', right: '1rem', marginLeft: 'auto', maxWidth: '360px', zIndex: 2500, boxSizing: 'border-box', background: '#17171c', border: '1px solid rgba(76,175,80,0.6)', boxShadow: '0 10px 40px rgba(0,0,0,0.7)', padding: '1rem 1.1rem', color: '#f0ede8', fontFamily: "'Syne', sans-serif" }}>
           <div style={{ fontFamily: mono, fontSize: '0.68rem', color: '#4caf50', letterSpacing: '0.15em', textTransform: 'uppercase' }}>📞 Incoming {first.kind === 'VIDEO' ? 'video' : 'voice'} call</div>
           <div style={{ fontSize: '1.2rem', fontWeight: 800, margin: '0.4rem 0 0.9rem' }}>{first.clientName}</div>
           <div style={{ display: 'flex', gap: '0.6rem' }}>
-            <button type="button" style={btn('#2e7d32')} onClick={async () => { setError(''); try { await join(await act(first.id, 'accept'), first.clientName); } catch { setError('No connection.'); } refresh(); }}>Answer</button>
-            <button type="button" style={btn('#7a1020')} onClick={async () => { await act(first.id, 'decline').catch(() => {}); refresh(); }}>Decline</button>
+            <button type="button" style={btn('#2e7d32')} onClick={async () => { setError(''); seq.current++; try { await join(await act(first.id, 'accept'), first.clientName); } catch { setError('No connection.'); } refresh(); }}>Answer</button>
+            <button type="button" style={btn('#7a1020')} onClick={async () => { const id = first.id; seq.current++; setIncoming((l) => l.filter((c) => c.id !== id)); await act(id, 'decline').catch(() => {}); refresh(); }}>Decline</button>
           </div>
           {incoming.length > 1 && <div style={{ fontFamily: mono, fontSize: '0.66rem', color: '#999', marginTop: '0.7rem' }}>+{incoming.length - 1} more waiting</div>}
         </div>
       )}
 
       {rejoinable.length > 0 && (
-        <div style={{ position: 'fixed', bottom: '1rem', right: '1rem', zIndex: 2400, background: '#17171c', border: '1px solid rgba(224,160,48,0.6)', padding: '0.7rem 0.9rem', color: '#f0ede8', fontFamily: "'Syne', sans-serif", display: 'flex', gap: '0.7rem', alignItems: 'center', flexWrap: 'wrap' }}>
+        <div style={{ position: 'fixed', bottom: '1rem', left: '1rem', right: '1rem', marginLeft: 'auto', maxWidth: '420px', boxSizing: 'border-box', zIndex: 2400, background: '#17171c', border: '1px solid rgba(224,160,48,0.6)', padding: '0.7rem 0.9rem', color: '#f0ede8', fontFamily: "'Syne', sans-serif", display: 'flex', gap: '0.7rem', alignItems: 'center', flexWrap: 'wrap' }}>
           <span style={{ fontSize: '0.85rem' }}>Call with <strong>{rejoinable[0].clientName}</strong> {rejoinable[0].status === 'ACTIVE' ? 'is in progress' : 'is still ringing'}</span>
           <button type="button" style={btn('#2e7d32')} onClick={async () => { setError(''); try { await join(await act(rejoinable[0].id, 'token'), rejoinable[0].clientName); } catch { setError('No connection.'); } }}>Rejoin</button>
-          <button type="button" style={btn('#7a1020')} onClick={async () => { await act(rejoinable[0].id, 'end').catch(() => {}); refresh(); }}>End</button>
+          <button type="button" style={btn('#7a1020')} onClick={async () => { const id = rejoinable[0].id; seq.current++; setLive((l) => l.filter((c) => c.id !== id)); await act(id, 'end').catch(() => {}); refresh(); }}>End</button>
         </div>
       )}
 
