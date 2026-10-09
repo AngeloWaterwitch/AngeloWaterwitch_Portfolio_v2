@@ -14,7 +14,8 @@ const csp = [
   "frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com",
   "object-src 'none'",
   "base-uri 'self'",
-  "form-action 'self'",
+  // The pay button posts a signed form to PayFast's hosted checkout.
+  "form-action 'self' https://www.payfast.co.za https://sandbox.payfast.co.za",
   "frame-ancestors 'none'",
   ...(isProd ? ['upgrade-insecure-requests'] : []),
 ].join('; ');
