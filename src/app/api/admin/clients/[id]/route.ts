@@ -31,7 +31,10 @@ const detailSelect = {
   accessCodeHint: true, codeIssuedAt: true, codeExpiresAt: true, lastLoginAt: true, createdAt: true,
   projects: {
     orderBy: { createdAt: 'desc' as const },
-    include: { updates: { orderBy: { createdAt: 'desc' as const } } },
+    include: {
+      updates: { orderBy: { createdAt: 'desc' as const } },
+      payments: { orderBy: { createdAt: 'desc' as const }, select: { id: true, kind: true, amountCents: true, status: true, paidAt: true, createdAt: true } },
+    },
   },
 };
 

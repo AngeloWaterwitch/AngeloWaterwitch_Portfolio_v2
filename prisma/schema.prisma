@@ -253,24 +253,26 @@ enum ProjectStatus {
 }
 
 model Client {
-  id             String          @id @default(cuid())
+  id             String           @id @default(cuid())
   name           String
   email          String
   phone          String?
   company        String?
-  status         ClientStatus    @default(ACTIVE)
+  status         ClientStatus     @default(ACTIVE)
   // The access code is never stored. Only a keyed hash (for lookup) and the last 4 characters (so you can tell codes apart).
-  accessCodeHash String          @unique
+  accessCodeHash String           @unique
   accessCodeHint String
-  codeIssuedAt   DateTime        @default(now())
+  codeIssuedAt   DateTime         @default(now())
   codeExpiresAt  DateTime?
   lastLoginAt    DateTime?
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
   projects       ClientProject[]
   sessions       ClientSession[]
   chatMessages   ChatMessage[]
   calls          CallSession[]
+  payments       Payment[]
+  documents      ClientDocument[]
 }
 
 model ClientProject {
@@ -295,6 +297,7 @@ model ClientProject {
   workSessions     WorkSession[]
   overtimeRequests OvertimeRequest[]
   logEntries       WorkLogEntry[]
+  payments         Payment[]
 
   @@index([clientId])
 }
@@ -423,6 +426,87 @@ model CallSession {
   answeredAt  DateTime?
   endedAt     DateTime?
   createdAt   DateTime   @default(now())
+
+  @@index([clientId, createdAt])
+}
+
+// ─── Payments, business details & legal documents (Phase 4, slice 4) ───
+
+enum PaymentKind {
+  DEPOSIT
+  FINAL
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETE
+  FAILED
+  CANCELLED
+}
+
+model Payment {
+  id          String        @id @default(cuid())
+  projectId   String
+  project     ClientProject @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  clientId    String
+  client      Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  kind        PaymentKind
+  amountCents Int
+  currency    String        @default("ZAR")
+  status      PaymentStatus @default(PENDING)
+  provider    String        @default("PAYFAST")
+  mPaymentId  String        @unique
+  providerRef String?
+  paidAt      DateTime?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+
+  @@index([projectId])
+  @@index([clientId])
+}
+
+model BusinessProfile {
+  id                      String   @id @default(cuid())
+  tradingName             String
+  legalName               String
+  idOrRegNumber           String
+  address                 String
+  city                    String
+  province                String
+  email                   String
+  phone                   String   @default("")
+  vatRegistered           Boolean  @default(false)
+  vatNumber               String?
+  bankName                String   @default("")
+  accountHolder           String   @default("")
+  accountNumber           String   @default("")
+  branchCode              String   @default("")
+  accountType             String   @default("")
+  informationOfficerName  String
+  informationOfficerEmail String
+  createdAt               DateTime @default(now())
+  updatedAt               DateTime @updatedAt
+}
+
+model ClientDocument {
+  id                 String    @id @default(cuid())
+  clientId           String
+  client             Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  projectId          String?
+  type               String // QUOTE | CONTRACT | NDA | PRIVACY | CANCELLATION | RECEIPT
+  title              String
+  version            Int       @default(1)
+  content            Json
+  contentHash        String
+  requiresAcceptance Boolean   @default(false)
+  supersededAt       DateTime?
+  acceptedAt         DateTime?
+  acceptedName       String?
+  acceptedIp         String?
+  acceptedUserAgent  String?
+  emailedAt          DateTime?
+  emailError         String?
+  createdAt          DateTime  @default(now())
 
   @@index([clientId, createdAt])
 }

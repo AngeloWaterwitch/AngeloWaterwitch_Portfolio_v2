@@ -7,6 +7,7 @@ import { AdminGrid } from './AdminGrid';
 import { AdminToggle } from './AdminToggle';
 import { WorkPanel } from './WorkPanel';
 import { AdminChat } from './AdminChat';
+import { DocumentsPanel } from './DocumentsPanel';
 import CallErrorBoundary from '@/components/chat/CallErrorBoundary';
 import type { AdminSummary } from './AdminCallListener';
 import { PROJECT_STATUS_LABEL, formatDate, formatDateTime } from '@/lib/format';
@@ -45,7 +46,7 @@ export function ClientsTab({ summary }: { summary: AdminSummary | null }) {
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
   const [showNew, setShowNew] = useState(false);
-  const [newCode, setNewCode] = useState<{ code: string; forName: string } | null>(null);
+  const [newCode, setNewCode] = useState<{ code: string; forName: string; note?: string } | null>(null);
   const [error, setError] = useState('');
 
   const loadList = useCallback(async () => {
@@ -73,6 +74,7 @@ export function ClientsTab({ summary }: { summary: AdminSummary | null }) {
           <p style={{ ...mono, fontSize: '0.7rem', color: '#999', lineHeight: 1.6, margin: '0.7rem 0 1rem' }}>
             Copy it now and send it to the client yourself. It is not stored, so it cannot be shown again. If it is lost, issue a new one.
           </p>
+          {newCode.note && <p style={{ ...mono, fontSize: '0.7rem', color: '#d8c27a', lineHeight: 1.6, margin: '0 0 1rem' }}>{newCode.note}</p>}
           <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
             <button type="button" style={btn(true)} onClick={() => navigator.clipboard?.writeText(newCode.code)}>Copy code</button>
             <button type="button" style={btn()} onClick={() => setNewCode(null)}>I have copied it</button>
@@ -105,7 +107,7 @@ export function ClientsTab({ summary }: { summary: AdminSummary | null }) {
       {showNew && (
         <NewClientForm
           onCancel={() => setShowNew(false)}
-          onCreated={(client, code) => { setShowNew(false); setNewCode({ code, forName: client.name }); loadList(); }}
+          onCreated={(client, code, documents) => { setShowNew(false); setNewCode({ code, forName: client.name, note: documents ? (documents.skipped ? 'Documents: ' + documents.skipped : `${documents.issued} documents created for the client.`) : undefined }); loadList(); }}
         />
       )}
 
@@ -122,8 +124,9 @@ export function ClientsTab({ summary }: { summary: AdminSummary | null }) {
   );
 }
 
-function NewClientForm({ onCancel, onCreated }: { onCancel: () => void; onCreated: (client: any, code: string) => void }) {
+function NewClientForm({ onCancel, onCreated }: { onCancel: () => void; onCreated: (client: any, code: string, documents?: { issued: number; skipped?: string }) => void }) {
   const [f, setF] = useState({ name: '', email: '', phone: '', company: '', title: '', description: '', total: '', deposit: '' });
+  const [docs, setDocs] = useState({ issue: true, includeNda: true, email: true });
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const set = (k: keyof typeof f) => (v: string) => setF((p) => ({ ...p, [k]: v }));
@@ -132,10 +135,10 @@ function NewClientForm({ onCancel, onCreated }: { onCancel: () => void; onCreate
     setErr(''); setBusy(true);
     try {
       const out = await api('/api/admin/clients', 'POST', {
-        name: f.name, email: f.email, phone: f.phone, company: f.company,
+        name: f.name, email: f.email, phone: f.phone, company: f.company, documents: docs,
         project: { title: f.title, description: f.description, totalRands: Number(f.total) || 0, depositRands: Number(f.deposit) || 0 },
       });
-      onCreated(out.client, out.accessCode);
+      onCreated(out.client, out.accessCode, out.documents);
     } catch (e) { setErr((e as Error).message); }
     setBusy(false);
   };
@@ -156,6 +159,13 @@ function NewClientForm({ onCancel, onCreated }: { onCancel: () => void; onCreate
         <AdminField label="Total price (R)" value={f.total} onChange={set('total')} placeholder="15000" />
         <AdminField label="Deposit (R)" value={f.deposit} onChange={set('deposit')} placeholder="7500" />
       </AdminGrid>
+      <AdminLabel>Documents</AdminLabel>
+      <p style={{ ...mono, fontSize: '0.7rem', color: '#888', lineHeight: 1.6, marginBottom: '0.6rem' }}>The quote, agreement, privacy notice and cancellation policy are created for the client straight away. They accept the agreement in their portal before they can pay the deposit.</p>
+      <div style={{ display: 'flex', gap: '1.2rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+        <label style={{ ...mono, fontSize: '0.72rem', color: '#ccc', display: 'flex', gap: '0.4rem', alignItems: 'center' }}><input type="checkbox" checked={docs.issue} onChange={(e) => setDocs({ ...docs, issue: e.target.checked })} /> Create the documents</label>
+        <label style={{ ...mono, fontSize: '0.72rem', color: '#ccc', display: 'flex', gap: '0.4rem', alignItems: 'center' }}><input type="checkbox" checked={docs.includeNda} disabled={!docs.issue} onChange={(e) => setDocs({ ...docs, includeNda: e.target.checked })} /> Include a mutual NDA</label>
+        <label style={{ ...mono, fontSize: '0.72rem', color: '#ccc', display: 'flex', gap: '0.4rem', alignItems: 'center' }}><input type="checkbox" checked={docs.email} disabled={!docs.issue} onChange={(e) => setDocs({ ...docs, email: e.target.checked })} /> Email them to the client</label>
+      </div>
       {err && <div role="alert" style={{ ...mono, fontSize: '0.74rem', color: 'hsl(348,100%,62%)', margin: '0.5rem 0 1rem' }}>{err}</div>}
       <div style={{ display: 'flex', gap: '0.6rem' }}>
         <button type="button" style={btn(true)} disabled={busy} onClick={submit}>{busy ? 'Creating...' : 'Create client & generate code'}</button>
@@ -223,6 +233,9 @@ function ClientDetail({ id, onBack, onCode, run, summary }: { summary: AdminSumm
       {summary && !summary.callsEnabled && (
         <p style={{ ...mono, fontSize: '0.68rem', color: '#777', marginTop: '0.6rem', lineHeight: 1.6 }}>Voice and video calls are switched off until the LiveKit settings are added (see the setup notes).</p>
       )}
+
+      <AdminLabel>Documents</AdminLabel>
+      <DocumentsPanel clientId={id} projects={client.projects.map((p: any) => ({ id: p.id, title: p.title }))} closed={!active} />
 
       <AdminLabel>Projects</AdminLabel>
       {client.projects.map((p: any) => (
@@ -308,6 +321,17 @@ function ProjectEditor({ project, run, reload }: { project: any; run: (fn: () =>
         <AdminToggle label="Visible to the client" checked={upd.visible} onChange={(v) => setUpd({ ...upd, visible: v })} />
       </AdminGrid>
       <button type="button" style={btn(true)} onClick={post}>Post update</button>
+
+      {project.payments?.length > 0 && (
+        <div style={{ marginTop: '1.2rem' }}>
+          <div style={{ ...mono, fontSize: '0.72rem', color: '#f0ede8', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>Online payments</div>
+          {project.payments.map((pay: any) => (
+            <div key={pay.id} style={{ ...mono, fontSize: '0.7rem', color: pay.status === 'COMPLETE' ? '#6fcf73' : '#aaa', padding: '0.25rem 0' }}>
+              {pay.kind === 'DEPOSIT' ? 'Deposit' : 'Final payment'} · R {(pay.amountCents / 100).toFixed(2)} · {pay.status}{pay.paidAt ? ' · ' + formatDateTime(pay.paidAt) : ''}
+            </div>
+          ))}
+        </div>
+      )}
 
       <WorkPanel projectId={project.id} locked={['COMPLETED', 'CANCELLED'].includes(project.status)} />
 

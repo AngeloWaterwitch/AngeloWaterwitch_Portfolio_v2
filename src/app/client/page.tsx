@@ -5,6 +5,10 @@ import { PROJECT_STATUS_LABEL, formatRands, formatDate, formatDateTime } from '@
 import LogoutButton from './LogoutButton';
 import ProjectLive from './ProjectLive';
 import ChatLauncher from './ChatLauncher';
+import DocumentsPanel, { type ClientDoc } from './DocumentsPanel';
+import PaymentPanel from './PaymentPanel';
+import PaymentReturnBanner from './PaymentReturnBanner';
+import { payfastConfigured } from '@/lib/payfast';
 import { loadWorkData } from '@/lib/worklog';
 
 export const dynamic = 'force-dynamic';
@@ -28,6 +32,17 @@ export default async function ClientDashboard() {
     orderBy: { createdAt: 'desc' },
     include: { updates: { where: { visibleToClient: true }, orderBy: { createdAt: 'desc' }, take: 50 } },
   });
+
+  // Current legal documents (older versions are kept on file but not shown). Text is only sent for ones still to accept.
+  const docRows = await prisma.clientDocument.findMany({ where: { clientId: client.id, supersededAt: null }, orderBy: { createdAt: 'asc' } });
+  const docs: ClientDoc[] = docRows.map((d) => ({
+    id: d.id, type: d.type, title: d.title, version: d.version, requiresAcceptance: d.requiresAcceptance,
+    acceptedAt: d.acceptedAt ? d.acceptedAt.toISOString() : null, createdAt: d.createdAt.toISOString(),
+    content: d.requiresAcceptance && !d.acceptedAt ? (d.content as unknown as ClientDoc['content']) : undefined,
+  }));
+  const hasAgreement = docRows.some((d) => d.type === 'CONTRACT');
+  const agreementAccepted = hasAgreement && docRows.every((d) => !d.requiresAcceptance || !!d.acceptedAt);
+  const payfastReady = payfastConfigured();
 
   // Work sessions, overtime and the (client-visible) activity log for each project.
   const serverNow = Date.now();
@@ -53,6 +68,9 @@ export default async function ClientDashboard() {
         </div>
         <LogoutButton />
       </header>
+
+      <PaymentReturnBanner />
+      <DocumentsPanel docs={docs} clientName={client.name} />
 
       {projects.length === 0 && (
         <p style={{ color: 'var(--cr-muted)' }}>No projects yet. Angelo will add yours shortly.</p>
@@ -116,6 +134,19 @@ export default async function ClientDashboard() {
                   <div><dt style={label}>Balance due</dt><dd style={{ fontWeight: 700, marginTop: '0.3rem' }}>{formatRands(balance, p.currency)}</dd></div>
                 </dl>
               )}
+
+              <PaymentPanel
+                projectId={p.id}
+                status={p.status}
+                currency={p.currency}
+                totalCents={p.totalCents}
+                depositCents={p.depositCents}
+                depositPaidAt={p.depositPaidAt ? p.depositPaidAt.toISOString() : null}
+                finalPaidAt={p.finalPaidAt ? p.finalPaidAt.toISOString() : null}
+                hasAgreement={hasAgreement}
+                agreementAccepted={agreementAccepted}
+                payfastReady={payfastReady}
+              />
 
               <div style={{ marginTop: '1.8rem' }}>
                 <h3 style={{ ...label, marginBottom: '1rem' }}>Updates</h3>

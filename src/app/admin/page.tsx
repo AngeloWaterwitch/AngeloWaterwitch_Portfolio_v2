@@ -10,6 +10,7 @@ import { FileUpload } from './components/FileUpload';
 import { SectionsTab } from './components/SectionsTab';
 import { HeaderFooterTab } from './components/HeaderFooterTab';
 import { ClientsTab } from './components/ClientsTab';
+import { BusinessTab } from './components/BusinessTab';
 import { AdminCallListener, type AdminSummary } from './components/AdminCallListener';
 import CallErrorBoundary from '@/components/chat/CallErrorBoundary';
 
@@ -64,6 +65,7 @@ export default function AdminPage() {
     { id: 'contact', label: 'Contact' },
     { id: 'clients', label: chatSummary && chatSummary.totalUnread > 0 ? `Clients (${chatSummary.totalUnread} new)` : 'Clients' },
     { id: 'messages', label: unreadCount > 0 ? `Messages (${unreadCount})` : 'Messages' },
+    { id: 'business', label: 'Business & Legal' },
     { id: 'sections', label: 'Sections & Nav' },
     { id: 'headerfooter', label: 'Header & Footer' },
     { id: 'seo', label: 'SEO' },
@@ -203,6 +205,7 @@ export default function AdminPage() {
           {activeTab === 'contact' && <ContactTab data={data} onRefetch={fetchData} />}
           {activeTab === 'clients' && <ClientsTab summary={chatSummary} />}
           {activeTab === 'messages' && <MessagesTab onRefetch={fetchData} />}
+          {activeTab === 'business' && <BusinessTab />}
           {activeTab === 'sections' && <SectionsTab data={data} onRefetch={fetchData} />}
           {activeTab === 'headerfooter' && <HeaderFooterTab data={data} onRefetch={fetchData} />}
           {activeTab === 'seo' && <SEOTab data={data} onRefetch={fetchData} />}

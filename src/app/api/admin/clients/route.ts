@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { after, NextRequest, NextResponse } from 'next/server';
 import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
 import { requireAuth } from '@/lib/api-auth';
@@ -6,6 +6,7 @@ import { sanitise } from '@/lib/sanitise';
 import { audit } from '@/lib/audit';
 import { clientIp } from '@/lib/ratelimit';
 import { issueAccessCode, formatAccessCode, normaliseAccessCode } from '@/lib/client-auth';
+import { emailDocuments, issueDocuments, loadBusiness } from '@/lib/legal/documents';
 
 const text = (min: number, max: number) => z.string().min(min).max(max).transform((s) => sanitise(s));
 const rands = z.number().min(0).max(10_000_000);
@@ -15,6 +16,7 @@ const createSchema = z.object({
   email: z.string().email().max(254).transform((s) => s.trim().toLowerCase()),
   phone: text(0, 40).optional().default(''),
   company: text(0, 120).optional().default(''),
+  documents: z.object({ issue: z.boolean().default(true), includeNda: z.boolean().default(true), email: z.boolean().default(true) }).optional().default({ issue: true, includeNda: true, email: true }),
   project: z
     .object({
       title: text(2, 120),
@@ -78,8 +80,27 @@ export async function POST(req: NextRequest) {
     });
 
     await audit('ADMIN', 'admin', 'client.create', { clientId: client.id }, clientIp(req));
+
+    // The document pack (quote, agreement, NDA, privacy notice, cancellation policy) is created straight away, and
+    // emailed to the client when email is set up. If the business details are missing it is skipped, not an error.
+    let documents: { issued: number; skipped?: string } = { issued: 0 };
+    if (d.documents.issue) {
+      if (!(await loadBusiness())) {
+        documents = { issued: 0, skipped: 'Fill in the Business & Legal tab, then use Issue documents on this client.' };
+      } else {
+        try {
+          const docs = await issueDocuments(client.id, client.projects[0].id, { includeNda: d.documents.includeNda });
+          documents = { issued: docs.length };
+          if (d.documents.email) after(() => emailDocuments(client.id, docs.map((x) => x.id)).then(() => undefined));
+        } catch (err) {
+          console.error('[admin clients POST] documents:', (err as Error).message);
+          documents = { issued: 0, skipped: 'The documents could not be created. Use Issue documents on this client.' };
+        }
+      }
+    }
+
     // The only time the plain code exists. It is not stored and cannot be shown again.
-    return NextResponse.json({ client, accessCode: formatAccessCode(normaliseAccessCode(code)!) }, { status: 201 });
+    return NextResponse.json({ client, documents, accessCode: formatAccessCode(normaliseAccessCode(code)!) }, { status: 201 });
   } catch (err) {
     console.error('[admin clients POST]', (err as Error).message);
     return NextResponse.json({ error: 'Failed to create the client' }, { status: 500 });
