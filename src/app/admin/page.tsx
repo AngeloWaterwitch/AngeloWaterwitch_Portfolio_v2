@@ -10,12 +10,14 @@ import { FileUpload } from './components/FileUpload';
 import { SectionsTab } from './components/SectionsTab';
 import { HeaderFooterTab } from './components/HeaderFooterTab';
 import { ClientsTab } from './components/ClientsTab';
+import { AdminCallListener, type AdminSummary } from './components/AdminCallListener';
 
 export default function AdminPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('hero');
   const [unreadCount, setUnreadCount] = useState(0);
+  const [chatSummary, setChatSummary] = useState<AdminSummary | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -59,7 +61,7 @@ export default function AdminPage() {
     { id: 'timeline', label: 'Timeline' },
     { id: 'testimonials', label: 'Testimonials' },
     { id: 'contact', label: 'Contact' },
-    { id: 'clients', label: 'Clients' },
+    { id: 'clients', label: chatSummary && chatSummary.totalUnread > 0 ? `Clients (${chatSummary.totalUnread} new)` : 'Clients' },
     { id: 'messages', label: unreadCount > 0 ? `Messages (${unreadCount})` : 'Messages' },
     { id: 'sections', label: 'Sections & Nav' },
     { id: 'headerfooter', label: 'Header & Footer' },
@@ -71,6 +73,7 @@ export default function AdminPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a0a' }}>
+      <AdminCallListener onSummary={setChatSummary} />
 
       {/* Header */}
       <div style={{
@@ -195,7 +198,7 @@ export default function AdminPage() {
           {activeTab === 'timeline' && <TimelineTab data={data} onRefetch={fetchData} />}
           {activeTab === 'testimonials' && <TestimonialsTab data={data} onRefetch={fetchData} />}
           {activeTab === 'contact' && <ContactTab data={data} onRefetch={fetchData} />}
-          {activeTab === 'clients' && <ClientsTab />}
+          {activeTab === 'clients' && <ClientsTab summary={chatSummary} />}
           {activeTab === 'messages' && <MessagesTab onRefetch={fetchData} />}
           {activeTab === 'sections' && <SectionsTab data={data} onRefetch={fetchData} />}
           {activeTab === 'headerfooter' && <HeaderFooterTab data={data} onRefetch={fetchData} />}

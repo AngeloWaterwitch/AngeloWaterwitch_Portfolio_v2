@@ -269,6 +269,8 @@ model Client {
   updatedAt      DateTime        @updatedAt
   projects       ClientProject[]
   sessions       ClientSession[]
+  chatMessages   ChatMessage[]
+  calls          CallSession[]
 }
 
 model ClientProject {
@@ -385,4 +387,42 @@ model WorkLogEntry {
   createdAt       DateTime      @default(now())
 
   @@index([projectId, createdAt])
+}
+
+// ─── Chat & calls (Phase 4, slice 3) ────────────────────────
+
+enum CallStatus {
+  RINGING
+  ACTIVE
+  ENDED
+  MISSED
+  DECLINED
+  CANCELLED
+}
+
+model ChatMessage {
+  id        String    @id @default(cuid())
+  clientId  String
+  client    Client    @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  sender    String // ADMIN | CLIENT | SYSTEM
+  body      String
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+
+  @@index([clientId, createdAt])
+}
+
+model CallSession {
+  id          String     @id @default(cuid())
+  clientId    String
+  client      Client     @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  initiatedBy String // ADMIN | CLIENT
+  kind        String // AUDIO | VIDEO
+  status      CallStatus @default(RINGING)
+  roomName    String     @unique
+  answeredAt  DateTime?
+  endedAt     DateTime?
+  createdAt   DateTime   @default(now())
+
+  @@index([clientId, createdAt])
 }

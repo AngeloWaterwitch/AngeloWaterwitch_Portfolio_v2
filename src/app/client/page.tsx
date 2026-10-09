@@ -4,6 +4,7 @@ import { getCurrentClient } from '@/lib/client-auth';
 import { PROJECT_STATUS_LABEL, formatRands, formatDate, formatDateTime } from '@/lib/format';
 import LogoutButton from './LogoutButton';
 import ProjectLive from './ProjectLive';
+import ChatLauncher from './ChatLauncher';
 import { loadWorkData } from '@/lib/worklog';
 
 export const dynamic = 'force-dynamic';
@@ -162,6 +163,8 @@ export default async function ClientDashboard() {
           );
         })}
       </div>
+
+      <ChatLauncher />
     </main>
   );
 }
