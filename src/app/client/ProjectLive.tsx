@@ -39,7 +39,10 @@ export default function ProjectLive({ projectId, initial, serverNow }: { project
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
 
+  const polling = useRef(false);
   const refresh = useCallback(async () => {
+    if (polling.current) return; // never stack polls when the network is slow
+    polling.current = true;
     try {
       const res = await fetch('/api/client/live', { cache: 'no-store' });
       if (res.status === 401) { router.push('/client/login'); return; }
@@ -48,7 +51,7 @@ export default function ProjectLive({ projectId, initial, serverNow }: { project
       skew.current = new Date(json.now).getTime() - Date.now();
       const mine = json.projects.find((p: any) => p.id === projectId);
       if (mine) setLive({ active: mine.active, lastWorkedAt: mine.lastWorkedAt, totalMinutes: mine.totalMinutes, overtimeMinutes: mine.overtimeMinutes, pendingOvertime: mine.pendingOvertime });
-    } catch { /* offline: keep showing the last known state */ }
+    } catch { /* offline: keep showing the last known state */ } finally { polling.current = false; }
   }, [projectId, router]);
 
   // Poll while the tab is visible, and refresh as soon as it becomes visible again.

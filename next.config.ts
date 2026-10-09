@@ -10,7 +10,7 @@ const csp = [
   "font-src 'self' https://fonts.gstatic.com data:",
   "img-src 'self' data: blob: https:",
   "media-src 'self' blob: https:",
-  "connect-src 'self' https://www.google.com/recaptcha/ https://*.supabase.co wss://*.supabase.co",
+  "connect-src 'self' https://www.google.com/recaptcha/ https://*.supabase.co wss://*.supabase.co https://*.livekit.cloud wss://*.livekit.cloud",
   "frame-src https://www.google.com/recaptcha/ https://recaptcha.google.com",
   "object-src 'none'",
   "base-uri 'self'",
@@ -24,7 +24,7 @@ const securityHeaders = [
   { key: 'X-Frame-Options', value: 'DENY' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-  { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), payment=()' },
+  { key: 'Permissions-Policy', value: 'camera=(self), microphone=(self), geolocation=(), payment=()' },
   { key: 'Strict-Transport-Security', value: 'max-age=63072000; includeSubDomains; preload' },
   { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
 ];

@@ -6,6 +6,8 @@ import { AdminField } from './AdminField';
 import { AdminGrid } from './AdminGrid';
 import { AdminToggle } from './AdminToggle';
 import { WorkPanel } from './WorkPanel';
+import { AdminChat } from './AdminChat';
+import type { AdminSummary } from './AdminCallListener';
 import { PROJECT_STATUS_LABEL, formatDate, formatDateTime } from '@/lib/format';
 
 const mono: React.CSSProperties = { fontFamily: "'Space Mono', monospace" };
@@ -37,7 +39,7 @@ async function api(path: string, method = 'GET', body?: unknown) {
 
 const toRands = (cents: number) => String(cents / 100);
 
-export function ClientsTab() {
+export function ClientsTab({ summary }: { summary: AdminSummary | null }) {
   const [clients, setClients] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string | null>(null);
@@ -87,7 +89,7 @@ export function ClientsTab() {
           {clients.map((c) => (
             <button key={c.id} type="button" onClick={() => setSelected(c.id)} style={{ ...card, width: '100%', textAlign: 'left', cursor: 'pointer', display: 'block', color: '#f0ede8' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-                <strong style={{ fontFamily: "'Syne', sans-serif" }}>{c.name}</strong>
+                <strong style={{ fontFamily: "'Syne', sans-serif" }}>{c.name}{summary?.unread?.[c.id] ? <span style={{ marginLeft: '0.6rem', background: 'hsl(348,100%,40%)', color: '#fff', borderRadius: '999px', padding: '0.1rem 0.55rem', fontFamily: "'Space Mono', monospace", fontSize: '0.68rem' }}>{summary.unread[c.id]} new</span> : null}</strong>
                 <span style={{ ...mono, fontSize: '0.68rem', color: CLIENT_STATUS_COLOR[c.status], textTransform: 'uppercase', letterSpacing: '0.1em' }}>{c.status}</span>
               </div>
               <div style={{ ...mono, fontSize: '0.7rem', color: '#888', marginTop: '0.3rem' }}>
@@ -112,6 +114,7 @@ export function ClientsTab() {
           onBack={() => { setSelected(null); loadList(); }}
           onCode={(code, forName) => setNewCode({ code, forName })}
           run={run}
+          summary={summary}
         />
       )}
     </div>
@@ -161,7 +164,7 @@ function NewClientForm({ onCancel, onCreated }: { onCancel: () => void; onCreate
   );
 }
 
-function ClientDetail({ id, onBack, onCode, run }: { id: string; onBack: () => void; onCode: (code: string, name: string) => void; run: (fn: () => Promise<void>) => Promise<void> }) {
+function ClientDetail({ id, onBack, onCode, run, summary }: { summary: AdminSummary | null; id: string; onBack: () => void; onCode: (code: string, name: string) => void; run: (fn: () => Promise<void>) => Promise<void> }) {
   const [client, setClient] = useState<any>(null);
   const [form, setForm] = useState({ name: '', email: '', phone: '', company: '' });
   const [newProject, setNewProject] = useState({ title: '', total: '', deposit: '' });
@@ -213,6 +216,12 @@ function ClientDetail({ id, onBack, onCode, run }: { id: string; onBack: () => v
           {!active && <button type="button" style={btn(true)} onClick={() => confirm('Reactivate this client? A new access code is issued.') && patch({ action: 'reactivate' })}>Reactivate &amp; issue new code</button>}
         </div>
       </div>
+
+      <AdminLabel>Chat</AdminLabel>
+      <AdminChat clientId={id} clientName={client.name} channel={summary?.channel ?? null} callsEnabled={!!summary?.callsEnabled} closed={!active} />
+      {summary && !summary.callsEnabled && (
+        <p style={{ ...mono, fontSize: '0.68rem', color: '#777', marginTop: '0.6rem', lineHeight: 1.6 }}>Voice and video calls are switched off until the LiveKit settings are added (see the setup notes).</p>
+      )}
 
       <AdminLabel>Projects</AdminLabel>
       {client.projects.map((p: any) => (
