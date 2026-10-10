@@ -16,13 +16,14 @@ export async function POST() {
   const site = (process.env.NEXTAUTH_URL ?? 'https://example.com').trim().replace(/^["']+|["']+$/g, '');
   const c = buildCheckout({ mPaymentId: 'check-' + Date.now(), amountCents: 500, itemName: 'Connection test', nameFirst: 'Test', email: 'test@example.com', siteUrl: site });
 
+  const started = Date.now();
   try {
     const res = await fetch(c.action, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded', Accept: 'text/html', 'User-Agent': 'Mozilla/5.0 (compatible; PortfolioPaymentCheck/1.0)' },
       body: new URLSearchParams(c.fields).toString(),
       redirect: 'manual',
-      signal: AbortSignal.timeout(10000),
+      signal: AbortSignal.timeout(20000),
     });
     const body = (await res.text()).replace(/<script[\s\S]*?<\/script>/g, '').replace(/<style[\s\S]*?<\/style>/g, '').replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ');
 
@@ -36,7 +37,11 @@ export async function POST() {
       return NextResponse.json({ ok: false, mode, message: 'PayFast refused the request: ' + body.slice(0, 200) });
     }
     return NextResponse.json({ ok: true, mode, message: `PayFast accepted the connection (${mode}).` });
-  } catch {
-    return NextResponse.json({ ok: false, mode, message: 'Could not reach PayFast. Try again in a moment.' });
+  } catch (err) {
+    // Say exactly what went wrong, so it can be fixed instead of guessed at.
+    const e = err as Error & { cause?: { code?: string; message?: string } };
+    const reason = e.name === 'TimeoutError' ? 'no answer within 20 seconds' : [e.cause?.code, e.cause?.message ?? e.message].filter(Boolean).join(': ');
+    console.error('[payfast check] request to PayFast failed after', Date.now() - started, 'ms:', reason);
+    return NextResponse.json({ ok: false, mode, message: `The server could not reach PayFast (${c.action.replace('https://', '').split('/')[0]}): ${reason || 'unknown error'} after ${Math.round((Date.now() - started) / 100) / 10}s. This is a network problem between your hosting and PayFast, not a problem with your keys.` });
   }
 }

@@ -108,8 +108,12 @@ export async function confirmWithPayfast(body: string): Promise<boolean> {
       body,
       signal: AbortSignal.timeout(8000),
     });
-    return (await res.text()).trim() === 'VALID';
-  } catch {
+    const text = (await res.text()).trim();
+    if (text !== 'VALID') console.error('[payfast] confirmation was not VALID:', res.status, text.slice(0, 80));
+    return text === 'VALID';
+  } catch (err) {
+    const e = err as Error & { cause?: { code?: string } };
+    console.error('[payfast] could not reach PayFast to confirm a payment:', e.name, e.cause?.code ?? '', e.message);
     return false;
   }
 }
