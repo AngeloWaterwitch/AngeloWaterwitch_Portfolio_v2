@@ -27,8 +27,11 @@ const tail = (v: unknown) => String(v ?? '').slice(-3);
  * The customer's browser returning to our site proves nothing.
  */
 export async function POST(req: NextRequest) {
-  const raw = await req.text();
-  const pairs = [...new URLSearchParams(raw).entries()] as [string, string][]; // order is part of the signature
+  // Normally a URL-encoded form; PayFast's test tools can send multipart. Field order is part of the signature.
+  const multipart = (req.headers.get('content-type') ?? '').includes('multipart/form-data');
+  const pairs: [string, string][] = multipart
+    ? [...(await req.formData()).entries()].map(([k, v]) => [k, String(v)] as [string, string])
+    : ([...new URLSearchParams(await req.text()).entries()] as [string, string][]);
   const data = Object.fromEntries(pairs);
   const ip = clientIp(req);
 
