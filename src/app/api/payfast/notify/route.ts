@@ -8,7 +8,7 @@ import { adminChannel, ping } from '@/lib/realtime';
 import { postSystemMessage } from '@/lib/chat';
 import { createReceipt, emailDocuments } from '@/lib/legal/documents';
 import { formatRands } from '@/lib/format';
-import { confirmWithPayfast, isPayfastIp, phpUrlEncode, skipNetworkChecks, verifyItnSignature } from '@/lib/payfast';
+import { confirmWithPayfast, isPayfastIp, payfastMode, phpUrlEncode, skipNetworkChecks, verifyItnSignature } from '@/lib/payfast';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +33,11 @@ export async function POST(req: NextRequest) {
   if (!verifyItnSignature(pairs)) return bad('signature');
 
   // 2. the request really comes from PayFast
-  if (!skipNetworkChecks() && !(await isPayfastIp(ip))) return bad('source');
+  // In sandbox the sender's address is only logged: step 4 (PayFast confirming the notification) is what proves it. Live enforces both.
+  if (!skipNetworkChecks() && !(await isPayfastIp(ip))) {
+    if (payfastMode() === 'live') return bad('source ' + ip);
+    console.warn('[payfast itn] sandbox sender not in the known ranges:', ip);
+  }
 
   // 3. it is about one of our payments, for our merchant, and the amount matches what we asked for
   if (data.merchant_id !== clean(process.env.PAYFAST_MERCHANT_ID)) return bad('merchant');
