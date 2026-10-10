@@ -31,10 +31,10 @@ export function phpUrlEncode(value: string): string {
 }
 
 /** MD5 of the field string, in the order given, skipping blanks, with the passphrase appended when one is set. */
-export function signFields(fields: [string, string][], passphrase = clean(process.env.PAYFAST_PASSPHRASE)): string {
+export function signFields(fields: [string, string][], passphrase = clean(process.env.PAYFAST_PASSPHRASE), keepBlanks = false): string {
   const parts = fields
-    .filter(([k, v]) => k !== 'signature' && v !== undefined && String(v).trim() !== '')
-    .map(([k, v]) => `${k}=${phpUrlEncode(String(v).trim())}`);
+    .filter(([k, v]) => k !== 'signature' && v !== undefined && (keepBlanks || String(v).trim() !== ''))
+    .map(([k, v]) => `${k}=${phpUrlEncode(keepBlanks ? String(v) : String(v).trim())}`);
   if (passphrase) parts.push(`passphrase=${phpUrlEncode(passphrase)}`);
   return createHash('md5').update(parts.join('&')).digest('hex');
 }
@@ -81,15 +81,17 @@ export function buildCheckout(input: CheckoutInput) {
 export function verifyItnSignature(pairs: [string, string][]): boolean {
   const received = pairs.find(([k]) => k === 'signature')?.[1];
   if (!received) return false;
-  const expected = signFields(pairs.filter(([k]) => k !== 'signature'));
-  return received.toLowerCase() === expected;
+  const fields = pairs.filter(([k]) => k !== 'signature');
+  const got = received.toLowerCase();
+  // PayFast signs a notification over every field it sent, blanks included. Accept the blank-skipping form too.
+  return signFields(fields, undefined, true) === got || signFields(fields) === got;
 }
 
 /** PayFast's published notification server ranges (CIDR). */
 const PAYFAST_RANGES = ['197.97.145.144/28', '41.74.179.192/27', '102.216.36.0/28', '102.216.36.128/28', '144.126.193.139/32'];
 
 function ipv4ToInt(ip: string): number | null {
-  const m = ip.match(/^(d{1,3}).(d{1,3}).(d{1,3}).(d{1,3})$/);
+  const m = ip.match(/^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/);
   if (!m) return null;
   const n = m.slice(1).map(Number);
   if (n.some((x) => x > 255)) return null;
