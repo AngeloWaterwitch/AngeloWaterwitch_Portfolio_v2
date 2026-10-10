@@ -13,10 +13,13 @@ import { confirmWithPayfast, isPayfastIp, payfastMode, phpUrlEncode, skipNetwork
 export const dynamic = 'force-dynamic';
 
 const clean = (v: string | undefined) => (v ?? '').trim().replace(/^["']+|["']+$/g, '');
-const bad = (reason: string, status = 400) => {
+// Every rejection is written to the audit log (no secrets) so the reason can be read later.
+const bad = async (reason: string, extra: Record<string, unknown> = {}, status = 400) => {
   console.warn('[payfast itn] rejected:', reason);
+  await audit('SYSTEM', null, 'payment.itn-rejected', { reason, ...extra });
   return new NextResponse(reason, { status });
 };
+const tail = (v: unknown) => String(v ?? '').slice(-3);
 
 /**
  * PayFast calls this from its own servers when a payment changes. A payment is only marked paid here, and only after
@@ -30,29 +33,29 @@ export async function POST(req: NextRequest) {
   const ip = clientIp(req);
 
   // 1. signature
-  if (!verifyItnSignature(pairs)) return bad('signature');
+  if (!verifyItnSignature(pairs)) return bad('signature', { fields: pairs.map(([k]) => k).join(',') });
 
   // 2. the request really comes from PayFast
   // In sandbox the sender's address is only logged: step 4 (PayFast confirming the notification) is what proves it. Live enforces both.
   if (!skipNetworkChecks() && !(await isPayfastIp(ip))) {
-    if (payfastMode() === 'live') return bad('source ' + ip);
+    if (payfastMode() === 'live') return bad('source', { ip });
     console.warn('[payfast itn] sandbox sender not in the known ranges:', ip);
   }
 
   // 3. it is about one of our payments, for our merchant, and the amount matches what we asked for
-  if (data.merchant_id !== clean(process.env.PAYFAST_MERCHANT_ID)) return bad('merchant');
+  if (data.merchant_id !== clean(process.env.PAYFAST_MERCHANT_ID)) return bad('merchant', { gotEnds: tail(data.merchant_id), expectedEnds: tail(clean(process.env.PAYFAST_MERCHANT_ID)) });
   const payment = await prisma.payment.findUnique({ where: { mPaymentId: data.m_payment_id ?? '' } });
-  if (!payment) return bad('unknown payment');
+  if (!payment) return bad('unknown payment', { mPaymentId: data.m_payment_id });
   const grossCents = Math.round(parseFloat(data.amount_gross ?? 'NaN') * 100);
   if (!Number.isFinite(grossCents) || grossCents !== payment.amountCents) {
     await audit('SYSTEM', null, 'payment.amount-mismatch', { paymentId: payment.id, expected: payment.amountCents, got: grossCents }, ip);
-    return bad('amount');
+    return bad('amount', { expected: payment.amountCents, got: grossCents });
   }
 
   // 4. PayFast confirms it sent this notification
   if (!skipNetworkChecks()) {
     const body = pairs.filter(([k]) => k !== 'signature').map(([k, v]) => `${k}=${phpUrlEncode(v)}`).join('&');
-    if (!(await confirmWithPayfast(body))) return bad('not confirmed by PayFast');
+    if (!(await confirmWithPayfast(body))) return bad('not confirmed by PayFast', { mPaymentId: data.m_payment_id });
   }
 
   const status = (data.payment_status ?? '').toUpperCase();
