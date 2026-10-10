@@ -58,3 +58,12 @@ The text lives in `src/lib/legal/templates.ts` (the numbers, such as 2 revision 
 3. The **Pay deposit** button unlocks. After PayFast confirms, work can start and a receipt is created.
 4. When you set the project to **In review**, the **Pay final balance** button unlocks. After payment, you hand over the files and go live.
 5. If you change the price after documents were issued, the admin shows "out of date: re-issue". Re-issuing creates version 2 (version 1 stays on file) and the client accepts again.
+
+## Profile, cancellation and data deletion (slice 5)
+
+- **Client profile**: clients can edit their name, email, phone and company, download a copy of all their data (JSON), and delete their profile from the bottom of the portal.
+- **Cancel a project**: each unfinished project has a "Cancel this project" button. Before the deposit is paid it costs nothing. After it, the deposit is **not refunded**, and the client must tick a box saying they understand. A Cancellation Notice is added to their documents. Pending payments, overtime requests and running work sessions are stopped.
+- **Delete my profile (POPIA)**: personal details, chat, calls, work logs and updates are erased at once and access is closed. The signed agreement, quote, receipts, cancellation notices and payment records are kept for **5 years** (tax / Companies Act / CPA), then removed by "Delete expired records" on the admin Clients list.
+- **Admin**: the client's Danger zone has "Erase personal data (keep records)" for client requests, and "Delete everything", which is refused while the client has payments on file.
+- The privacy notice template is now version T2 and describes these rights and the 5-year retention. Have an attorney review it with the other documents.
+- Database change: new nullable columns only (migration `20261013090000_add_profile_erasure`, already applied).

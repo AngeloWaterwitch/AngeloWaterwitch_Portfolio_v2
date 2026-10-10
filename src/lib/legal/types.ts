@@ -17,7 +17,7 @@ export type DocContent = {
   snapshot?: { title: string; totalCents: number; depositCents: number };
 };
 
-export type DocType = 'QUOTE' | 'CONTRACT' | 'NDA' | 'PRIVACY' | 'CANCELLATION' | 'RECEIPT';
+export type DocType = 'QUOTE' | 'CONTRACT' | 'NDA' | 'PRIVACY' | 'CANCELLATION' | 'RECEIPT' | 'CANCELLATION_NOTICE';
 
 export const DOC_LABEL: Record<DocType, string> = {
   QUOTE: 'Quotation',
@@ -26,6 +26,7 @@ export const DOC_LABEL: Record<DocType, string> = {
   PRIVACY: 'Privacy Notice (POPIA)',
   CANCELLATION: 'Cancellation & Refund Policy',
   RECEIPT: 'Payment Receipt',
+  CANCELLATION_NOTICE: 'Cancellation Notice',
 };
 
 /** Documents the client must accept before paying the deposit. */

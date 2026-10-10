@@ -89,11 +89,16 @@ export function ClientsTab({ summary }: { summary: AdminSummary | null }) {
           </div>
           {loading && <p style={{ ...mono, fontSize: '0.75rem', color: '#777' }}>Loading...</p>}
           {!loading && clients.length === 0 && <p style={{ ...mono, fontSize: '0.75rem', color: '#777' }}>No clients yet.</p>}
+          {clients.some((c) => c.deletedAt && c.retainUntil && new Date(c.retainUntil) < new Date()) && (
+            <div style={{ marginBottom: '1rem' }}>
+              <button type="button" style={btn(false, true)} onClick={() => confirm('Permanently delete the erased clients whose 5-year retention period is over?') && run(async () => { await api('/api/admin/purge', 'POST', {}); await loadList(); })}>Delete expired records</button>
+            </div>
+          )}
           {clients.map((c) => (
             <button key={c.id} type="button" onClick={() => setSelected(c.id)} style={{ ...card, width: '100%', textAlign: 'left', cursor: 'pointer', display: 'block', color: '#f0ede8' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
                 <strong style={{ fontFamily: "'Syne', sans-serif" }}>{c.name}{summary?.unread?.[c.id] ? <span style={{ marginLeft: '0.6rem', background: 'hsl(348,100%,40%)', color: '#fff', borderRadius: '999px', padding: '0.1rem 0.55rem', fontFamily: "'Space Mono', monospace", fontSize: '0.68rem' }}>{summary.unread[c.id]} new</span> : null}</strong>
-                <span style={{ ...mono, fontSize: '0.68rem', color: CLIENT_STATUS_COLOR[c.status], textTransform: 'uppercase', letterSpacing: '0.1em' }}>{c.status}</span>
+                <span style={{ ...mono, fontSize: '0.68rem', color: CLIENT_STATUS_COLOR[c.status], textTransform: 'uppercase', letterSpacing: '0.1em' }}>{c.deletedAt ? 'ERASED' : c.status}</span>
               </div>
               <div style={{ ...mono, fontSize: '0.7rem', color: '#888', marginTop: '0.3rem' }}>
                 {c.email} · {c.projects.length} project{c.projects.length === 1 ? '' : 's'} · code …{c.accessCodeHint}
@@ -259,9 +264,32 @@ function ClientDetail({ id, onBack, onCode, run, summary }: { summary: AdminSumm
       )}
 
       <AdminLabel>Danger zone</AdminLabel>
-      <button type="button" style={btn(false, true)} onClick={() => confirm(`Permanently delete ${client.name} and all their projects and updates? This cannot be undone.`) && run(async () => { await api('/api/admin/clients/' + id, 'DELETE'); onBack(); })}>
-        Delete client &amp; all data
-      </button>
+      {client.deletedAt ? (
+        <div style={card}>
+          <div style={{ ...mono, fontSize: '0.74rem', color: '#bbb', lineHeight: 1.8 }}>
+            Personal data erased {formatDateTime(client.deletedAt)}. Only the financial records the law requires are kept
+            {client.retainUntil ? <>, until {formatDate(client.retainUntil)}</> : null}. After that, use &quot;Delete expired records&quot; on the client list.
+          </div>
+        </div>
+      ) : (
+        <div style={card}>
+          <p style={{ ...mono, fontSize: '0.7rem', color: '#999', lineHeight: 1.7, margin: '0 0 0.9rem' }}>
+            <strong style={{ color: '#ddd' }}>Erase personal data</strong> is what to use when a client asks to be deleted (POPIA). It removes their details, chat, calls and work logs
+            and closes their access, but keeps the signed agreement, quote, receipts and payments for 5 years, as tax law requires.
+            <br /><br />
+            <strong style={{ color: '#ddd' }}>Delete everything</strong> removes all records at once. It is refused while the client has payments on file, so you never destroy records you must keep.
+          </p>
+          <div style={{ display: 'flex', gap: '0.6rem', flexWrap: 'wrap' }}>
+            <button type="button" style={btn(false, true)} onClick={() => {
+              if (prompt(`Erase ${client.name}'s personal data? Financial records are kept for 5 years. Type ERASE to confirm.`)?.trim().toUpperCase() !== 'ERASE') return;
+              run(async () => { await api(`/api/admin/clients/${id}/erase`, 'POST', { confirm: 'ERASE' }); await load(); });
+            }}>Erase personal data (keep records)</button>
+            <button type="button" style={btn(false, true)} onClick={() => confirm(`Permanently delete ${client.name} and all their projects and updates? This cannot be undone.`) && run(async () => { await api('/api/admin/clients/' + id, 'DELETE'); onBack(); })}>
+              Delete everything
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

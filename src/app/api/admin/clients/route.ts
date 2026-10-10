@@ -29,7 +29,7 @@ const createSchema = z.object({
 
 const publicClient = {
   id: true, name: true, email: true, phone: true, company: true, status: true,
-  accessCodeHint: true, codeIssuedAt: true, codeExpiresAt: true, lastLoginAt: true, createdAt: true,
+  accessCodeHint: true, codeIssuedAt: true, codeExpiresAt: true, lastLoginAt: true, createdAt: true, deletedAt: true, retainUntil: true,
 } as const;
 
 export async function GET() {
