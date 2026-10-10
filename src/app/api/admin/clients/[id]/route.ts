@@ -28,7 +28,7 @@ const patchSchema = z.discriminatedUnion('action', [
 
 const detailSelect = {
   id: true, name: true, email: true, phone: true, company: true, status: true,
-  accessCodeHint: true, codeIssuedAt: true, codeExpiresAt: true, lastLoginAt: true, createdAt: true,
+  accessCodeHint: true, codeIssuedAt: true, codeExpiresAt: true, lastLoginAt: true, createdAt: true, deletedAt: true, retainUntil: true,
   projects: {
     orderBy: { createdAt: 'desc' as const },
     include: {
@@ -102,7 +102,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
         prisma.client.update({ where: { id }, data: { status: 'CANCELLED' } }),
         prisma.clientProject.updateMany({
           where: { clientId: id, status: { notIn: ['COMPLETED', 'CANCELLED'] } },
-          data: { status: 'CANCELLED', cancelledAt: new Date() },
+          data: { status: 'CANCELLED', cancelledAt: new Date(), cancelledBy: 'ADMIN' },
         }),
       ]);
       await revokeClientAccess(id);
@@ -122,6 +122,16 @@ export async function DELETE(req: NextRequest, { params }: Ctx) {
   const { error } = await requireAuth();
   if (error) return error;
   const { id } = await params;
+
+  // Clients who paid must not be hard-deleted: payment records have to be kept (5 years). Use "Erase personal data" instead.
+  const target = await prisma.client.findUnique({ where: { id }, select: { id: true, deletedAt: true, retainUntil: true } });
+  if (target) {
+    const paid = await prisma.payment.count({ where: { clientId: id, status: 'COMPLETE' } });
+    const retentionOver = !!target.deletedAt && !!target.retainUntil && target.retainUntil < new Date();
+    if (paid > 0 && !retentionOver) {
+      return NextResponse.json({ error: 'This client has paid, and payment records must be kept for 5 years. Use "Erase personal data" instead: it removes the personal details and keeps only the records the law requires.' }, { status: 409 });
+    }
+  }
 
   try {
     await prisma.client.delete({ where: { id } }); // projects, updates and sessions are removed with it

@@ -57,7 +57,7 @@ export async function PATCH(req: NextRequest, { params }: Ctx) {
     data.status = d.status;
     if (d.status === 'IN_PROGRESS' && !current.startedAt) data.startedAt = now;
     if (d.status === 'COMPLETED') { data.completedAt = current.completedAt ?? now; data.progress = 100; }
-    if (d.status === 'CANCELLED') data.cancelledAt = current.cancelledAt ?? now;
+    if (d.status === 'CANCELLED') { data.cancelledAt = current.cancelledAt ?? now; data.cancelledBy = current.cancelledBy ?? 'ADMIN'; }
   }
 
   const project = await prisma.clientProject.update({ where: { id }, data });

@@ -265,6 +265,9 @@ model Client {
   codeIssuedAt   DateTime         @default(now())
   codeExpiresAt  DateTime?
   lastLoginAt    DateTime?
+  // POPIA erasure: personal details are wiped at once; records the law requires us to keep are locked until retainUntil.
+  deletedAt      DateTime?
+  retainUntil    DateTime?
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
   projects       ClientProject[]
@@ -291,6 +294,8 @@ model ClientProject {
   startedAt        DateTime?
   completedAt      DateTime?
   cancelledAt      DateTime?
+  cancelledBy      String? // CLIENT | ADMIN
+  cancelReason     String?
   createdAt        DateTime          @default(now())
   updatedAt        DateTime          @updatedAt
   updates          ProgressUpdate[]

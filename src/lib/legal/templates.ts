@@ -6,7 +6,7 @@ import type { DocContent, DocSection, LegalContext } from './types';
  * have an attorney review them before real clients sign (see SETUP-LEGAL.md for the points to check).
  */
 export const TERMS = {
-  templateVersion: 'T1',
+  templateVersion: 'T2',
   revisionRounds: 2,
   quoteValidDays: 14,
   clientResponseDays: 5,
@@ -228,9 +228,17 @@ export function buildPrivacy(c: LegalContext): DocContent {
         'PayFast (payments). Your card or bank details go directly to PayFast and are never stored by us.',
         'Google reCAPTCHA (protects our forms against bots).',
       ]), p('Some of these providers are outside South Africa. We only use providers that protect personal information to a standard comparable to POPIA.')] },
-      clause('How long we keep it', 'Project records, chat and the work log are kept while we work together and for up to 12 months afterwards, unless you ask for earlier deletion. Financial records (quotes, invoices, receipts, agreements) are kept for 5 years, as the law requires. After that we delete or anonymise them.'),
+      clause('How long we keep it', 'Project records, chat and the work log are kept while we work together and for up to 12 months afterwards, unless you ask for earlier deletion. Financial records (quotes, signed agreements, receipts and payment records) are kept for 5 years, as the law requires. After that we delete them.'),
       clause('How we protect it', 'Access to the portal needs a private access code that ends when your contract ends. Data is encrypted in transit, access is limited, and security events are logged. If your information is compromised we will tell you and the Information Regulator as the law requires.'),
-      clause('Your rights', 'You may ask to see the information we hold about you, ask us to correct it, ask us to delete it (we must keep records the law requires), object to its use, or withdraw consent where we rely on it. Email the Information Officer above. If you are unhappy with our answer, you may complain to the Information Regulator (inforegulator.org.za).'),
+      { heading: 'Your rights', blocks: [
+        p('You may ask to see the information we hold about you, ask us to correct it, ask us to delete it, object to its use, or withdraw consent where we rely on it.'),
+        list([
+          'In your client portal you can download all your data, correct your contact details, and delete your profile yourself.',
+          'Deleting your profile erases your name, contact details, chat, calls, work logs and project updates straight away and closes your access.',
+          'We must keep your signed agreement, quote, receipts and payment records for 5 years because the law requires financial records to be kept. They are locked away, used for nothing else, and deleted when the 5 years end.',
+          'You can also email the Information Officer above. If you are unhappy with our answer, you may complain to the Information Regulator (inforegulator.org.za).',
+        ]),
+      ] },
       clause('Your consent', 'By accepting the Website Development Agreement you confirm you have read this notice and agree to us processing your information as described.'),
     ],
   };
@@ -293,6 +301,54 @@ export function buildReceipt(c: LegalContext, r: ReceiptInfo): DocContent {
         ['Balance remaining', formatRands(balance, cur)],
       ]), p(vatLine(c))] },
       { heading: 'Notes', blocks: [p(r.kind === 'DEPOSIT' ? 'The deposit is non-refundable as set out in the Website Development Agreement and Cancellation & Refund Policy.' : 'Thank you. The files are handed over and the website goes live after final payment, as set out in the agreement.')] },
+    ],
+  };
+}
+
+// ─── Cancellation notice ────────────────────────────────────
+
+export type CancellationInfo = {
+  cancelledAt: Date;
+  by: 'CLIENT' | 'ADMIN';
+  reason: string;
+  depositPaidAt: Date | null;
+  paidToDateCents: number;
+};
+
+/** A record of a cancellation, given to the client, stating plainly what happens to the money. */
+export function buildCancellationNotice(c: LegalContext, i: CancellationInfo): DocContent {
+  const { dev, client } = who(c);
+  const cur = c.project.currency;
+  const m = money(c);
+  const depositPaid = !!i.depositPaidAt;
+  return {
+    title: 'Cancellation Notice',
+    subtitle: c.project.title,
+    meta: [['Reference', c.reference], ['Date', longDate(i.cancelledAt)]],
+    sections: [
+      { heading: 'What was cancelled', blocks: [rows([
+        ['Project', c.project.title],
+        ['Client', client],
+        ['Developer', dev],
+        ['Cancelled by', i.by === 'CLIENT' ? 'The client, through the client portal' : 'The Developer'],
+      ]), ...(i.reason ? [p('Reason given: ' + i.reason)] : [])] },
+      { heading: 'Payments', blocks: depositPaid
+        ? [
+            rows([['Deposit paid', formatRands(c.project.depositCents, cur)], ['Deposit paid on', longDate(i.depositPaidAt!)], ['Total paid to date', formatRands(i.paidToDateCents, cur)], ['Refund', 'None']]),
+            p('The deposit was paid before this cancellation, so it is non-refundable, as set out in clause 10 of the Website Development Agreement and in the Cancellation & Refund Policy that the client accepted. No further amount is owed for the cancelled work.'),
+          ]
+        : [
+            rows([['Deposit paid', 'None'], ['Amount owed', formatRands(0, cur)]]),
+            p('No deposit had been paid, so the cancellation costs the client nothing and nothing is owed.'),
+          ] },
+      { heading: 'What happens now', blocks: [list([
+        'All work on the project has stopped.',
+        'Unfinished work stays with the Developer and is not handed over.',
+        'Any payment that was still pending has been cancelled.',
+        `The agreed total of ${m.total} is no longer payable.`,
+        'The client can keep using the portal to download documents and to download or delete their data.',
+      ])] },
+      { heading: 'Your legal rights', blocks: [p('This notice does not take away any right you have by law that cannot be excluded by agreement.')] },
     ],
   };
 }

@@ -8,6 +8,8 @@ import ChatLauncher from './ChatLauncher';
 import DocumentsPanel, { type ClientDoc } from './DocumentsPanel';
 import PaymentPanel from './PaymentPanel';
 import PaymentReturnBanner from './PaymentReturnBanner';
+import ProfilePanel from './ProfilePanel';
+import CancelPanel from './CancelPanel';
 import { payfastConfigured } from '@/lib/payfast';
 import { loadWorkData } from '@/lib/worklog';
 
@@ -168,6 +170,18 @@ export default async function ClientDashboard() {
                 )}
               </div>
 
+              <CancelPanel
+                projectId={p.id}
+                title={p.title}
+                status={p.status}
+                currency={p.currency}
+                depositCents={p.depositCents}
+                depositPaidAt={p.depositPaidAt ? p.depositPaidAt.toISOString() : null}
+                finalPaidAt={p.finalPaidAt ? p.finalPaidAt.toISOString() : null}
+                cancelledAt={p.cancelledAt ? p.cancelledAt.toISOString() : null}
+                cancelledBy={p.cancelledBy}
+              />
+
               {w && (
                 <details style={{ marginTop: '1.6rem', borderTop: '1px solid #242424', paddingTop: '1.1rem' }}>
                   <summary style={{ ...label, cursor: 'pointer' }}>Activity log ({w.project.logEntries.length})</summary>
@@ -194,6 +208,15 @@ export default async function ClientDashboard() {
           );
         })}
       </div>
+
+      <ProfilePanel
+        name={client.name}
+        email={client.email}
+        phone={client.phone ?? ''}
+        company={client.company ?? ''}
+        hasOpenProjects={projects.some((p) => p.status !== 'COMPLETED' && p.status !== 'CANCELLED' && !p.finalPaidAt)}
+        depositPaid={projects.some((p) => !!p.depositPaidAt && p.status !== 'COMPLETED' && p.status !== 'CANCELLED' && !p.finalPaidAt)}
+      />
 
       <ChatLauncher />
     </main>
