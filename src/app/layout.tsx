@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { prisma } from '@/lib/prisma';
+import { getThemeAndBranding, fontsUrl } from '@/lib/theme-data';
 
 export const metadata: Metadata = {
   title: 'Angelo Waterwitch',
@@ -11,13 +11,10 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  let theme: Awaited<ReturnType<typeof prisma.themeSettings.findFirst>> = null;
-  let branding: Awaited<ReturnType<typeof prisma.branding.findFirst>> = null;
+  let theme: Awaited<ReturnType<typeof getThemeAndBranding>>['theme'] = null;
+  let branding: Awaited<ReturnType<typeof getThemeAndBranding>>['branding'] = null;
   try {
-    [theme, branding] = await Promise.all([
-      prisma.themeSettings.findFirst(),
-      prisma.branding.findFirst(),
-    ]);
+    ({ theme, branding } = await getThemeAndBranding());
   } catch (err) {
     console.error('[layout] database unavailable, using default theme:', (err as Error).message);
   }
@@ -42,7 +39,7 @@ export default async function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@400;600;700;800&family=Raleway:wght@400;500;600;700;800&family=Oswald:wght@400;500;600;700&family=Fira+Code:wght@400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap"
+          href={fontsUrl([theme?.displayFont, theme?.monoFont, branding?.displayFont, branding?.monoFont])}
           rel="stylesheet"
         />
         <style dangerouslySetInnerHTML={{ __html: cssVars }} />

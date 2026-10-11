@@ -1,4 +1,6 @@
+import { cache } from 'react';
 import { prisma } from '@/lib/prisma';
+import { getThemeAndBranding } from '@/lib/theme-data';
 import { resolveSettings } from '@/lib/siteSettings';
 
 async function loadSiteData() {
@@ -12,11 +14,10 @@ async function loadSiteData() {
     testimonials,
     contact,
     seo,
-    branding,
     sections,
     resume,
-    theme,
     settingsRow,
+    { theme, branding },
   ] = await Promise.all([
     prisma.heroContent.findFirst(),
     prisma.aboutContent.findFirst(),
@@ -33,12 +34,11 @@ async function loadSiteData() {
     }),
     prisma.contactInfo.findFirst(),
     prisma.sEOSettings.findFirst(),
-    prisma.branding.findFirst(),
     prisma.siteSection.findMany({ orderBy: { order: 'asc' } }),
     prisma.resumeFile.findFirst({ where: { enabled: true } }),
-    prisma.themeSettings.findFirst(),
     // Tolerate the table not existing yet (deploy before migration) without taking the site down.
     prisma.siteSettings.findFirst().catch(() => null),
+    getThemeAndBranding(),
   ]);
 
   return {
@@ -99,11 +99,12 @@ function fallbackSiteData() {
 
 type SiteData = Awaited<ReturnType<typeof loadSiteData>>;
 
-export async function getSiteData(): Promise<SiteData & { degraded: boolean }> {
+/** Read once per request: the page title and the page itself both ask for it. */
+export const getSiteData = cache(async function getSiteData(): Promise<SiteData & { degraded: boolean }> {
   try {
     return { ...(await loadSiteData()), degraded: false };
   } catch (err) {
     console.error('[getSiteData] database unavailable, serving fallback:', (err as Error).message);
     return { ...(fallbackSiteData() as unknown as SiteData), degraded: true };
   }
-}
+});
