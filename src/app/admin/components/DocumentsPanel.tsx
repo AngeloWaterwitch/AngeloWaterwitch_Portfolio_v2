@@ -8,7 +8,7 @@ const btn = (primary = false): React.CSSProperties => ({
   padding: '0.5rem 1rem', background: primary ? 'hsl(348,100%,40%)' : 'transparent', border: '1px solid ' + (primary ? 'hsl(348,100%,40%)' : '#333'),
   color: primary ? '#fff' : '#bbb', ...mono, fontSize: '0.7rem', letterSpacing: '0.08em', textTransform: 'uppercase', cursor: 'pointer', borderRadius: '1px', textDecoration: 'none', display: 'inline-block',
 });
-const chip = (color: string): React.CSSProperties => ({ ...mono, fontSize: '0.64rem', padding: '0.12rem 0.5rem', border: '1px solid ' + color, color, borderRadius: '999px', marginLeft: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.06em' });
+const chip = (color: string): React.CSSProperties => ({ ...mono, fontSize: '0.69rem', padding: '0.12rem 0.5rem', border: '1px solid ' + color, color, borderRadius: '999px', marginLeft: '0.4rem', textTransform: 'uppercase', letterSpacing: '0.06em' });
 
 type Doc = {
   id: string; type: string; title: string; version: number; projectId: string | null; requiresAcceptance: boolean; superseded: boolean;
@@ -80,15 +80,15 @@ export function DocumentsPanel({ clientId, projects, closed }: { clientId: strin
         <div key={d.id} style={{ borderTop: '1px solid #1f1f1f', padding: '0.6rem 0', display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
           <div>
             <span style={{ fontFamily: "'Syne', sans-serif", fontSize: '0.9rem', color: '#f0ede8' }}>{d.title}</span>
-            <span style={{ ...mono, fontSize: '0.64rem', color: '#777', marginLeft: '0.5rem' }}>v{d.version}</span>
+            <span style={{ ...mono, fontSize: '0.69rem', color: '#777', marginLeft: '0.5rem' }}>v{d.version}</span>
             {d.requiresAcceptance && (d.acceptedAt ? <span style={chip('#4caf50')}>accepted</span> : <span style={chip('#e0a030')}>waiting for client</span>)}
             {d.stale && <span style={chip('#ff8aa0')}>out of date: amounts changed, re-issue</span>}
             {d.emailError ? <span style={chip('#ff8aa0')}>not emailed</span> : d.emailedAt ? <span style={chip('#3fa7ff')}>emailed</span> : null}
-            <div style={{ ...mono, fontSize: '0.66rem', color: '#777', marginTop: '0.2rem' }}>
+            <div style={{ ...mono, fontSize: '0.69rem', color: '#777', marginTop: '0.2rem' }}>
               Issued {formatDateTime(d.createdAt)}
               {d.acceptedAt ? ` · accepted ${formatDateTime(d.acceptedAt)} by ${d.acceptedName}` : ''}
             </div>
-            {d.emailError && <div style={{ ...mono, fontSize: '0.64rem', color: '#ff8aa0', marginTop: '0.2rem', lineHeight: 1.5 }}>{d.emailError}</div>}
+            {d.emailError && <div style={{ ...mono, fontSize: '0.69rem', color: '#ff8aa0', marginTop: '0.2rem', lineHeight: 1.5 }}>{d.emailError}</div>}
           </div>
           <a href={`/api/admin/documents/${d.id}/pdf`} target="_blank" rel="noreferrer" style={btn()}>View PDF</a>
         </div>
@@ -96,9 +96,9 @@ export function DocumentsPanel({ clientId, projects, closed }: { clientId: strin
 
       {older.length > 0 && (
         <details style={{ marginTop: '0.8rem' }}>
-          <summary style={{ ...mono, fontSize: '0.68rem', color: '#999', cursor: 'pointer' }}>Earlier versions ({older.length})</summary>
+          <summary style={{ ...mono, fontSize: '0.69rem', color: '#999', cursor: 'pointer' }}>Earlier versions ({older.length})</summary>
           {older.map((d) => (
-            <div key={d.id} style={{ ...mono, fontSize: '0.68rem', color: '#888', padding: '0.4rem 0', display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
+            <div key={d.id} style={{ ...mono, fontSize: '0.69rem', color: '#888', padding: '0.4rem 0', display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
               <span>{d.title} v{d.version}{d.acceptedAt ? ` (was accepted ${formatDateTime(d.acceptedAt)})` : ''}</span>
               <a href={`/api/admin/documents/${d.id}/pdf`} target="_blank" rel="noreferrer" style={{ color: '#bbb' }}>PDF</a>
             </div>

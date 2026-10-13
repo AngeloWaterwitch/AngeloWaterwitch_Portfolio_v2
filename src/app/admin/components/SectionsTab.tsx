@@ -74,7 +74,7 @@ export function SectionsTab({ data, onRefetch }: any) {
                 style={{ width: '100%', background: '#0a0a0a', border: '1px solid #222', color: '#f0ede8', padding: '0.5rem 0.7rem', fontFamily: "'Syne', sans-serif", fontSize: '0.85rem', borderRadius: '1px', outline: 'none', boxSizing: 'border-box' }}
               />
             </div>
-            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.65rem', color: '#666' }}>#{r.sectionId}</span>
+            <span style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.69rem', color: '#666' }}>#{r.sectionId}</span>
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', fontFamily: "'Space Mono', monospace", fontSize: '0.7rem', color: '#bbb', cursor: 'pointer' }}>
               <input type="checkbox" checked={r.visible} onChange={e => update(i, { visible: e.target.checked })} style={{ accentColor: 'hsl(348,100%,45%)' }} />
               Visible

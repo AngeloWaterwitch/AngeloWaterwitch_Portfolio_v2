@@ -61,7 +61,7 @@ export function BusinessTab() {
   if (!loaded) return <p style={{ ...mono, fontSize: '0.75rem', color: '#777' }}>Loading...</p>;
 
   const chip = (ok: boolean, text: string) => (
-    <span style={{ ...mono, fontSize: '0.68rem', padding: '0.2rem 0.6rem', border: '1px solid ' + (ok ? '#2e7d32' : '#7a1020'), color: ok ? '#6fcf73' : '#ff8aa0', borderRadius: '999px', marginRight: '0.5rem' }}>{text}</span>
+    <span style={{ ...mono, fontSize: '0.69rem', padding: '0.2rem 0.6rem', border: '1px solid ' + (ok ? '#2e7d32' : '#7a1020'), color: ok ? '#6fcf73' : '#ff8aa0', borderRadius: '999px', marginRight: '0.5rem' }}>{text}</span>
   );
 
   return (

@@ -19,7 +19,7 @@ export function AdminToggle({ label, checked, onChange, hint }: AdminToggleProps
       <span>
         <span style={{ display: 'block', fontFamily: "'Syne', sans-serif", fontSize: '0.85rem', color: '#f0ede8' }}>{label}</span>
         {hint && (
-          <span style={{ display: 'block', fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: '#777', marginTop: '0.2rem', lineHeight: 1.5 }}>
+          <span style={{ display: 'block', fontFamily: "'Space Mono', monospace", fontSize: '0.69rem', color: '#777', marginTop: '0.2rem', lineHeight: 1.5 }}>
             {hint}
           </span>
         )}

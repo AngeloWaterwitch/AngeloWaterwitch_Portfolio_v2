@@ -34,7 +34,7 @@ export function AdminField({
     <div style={{ gridColumn: fullWidth ? '1 / -1' : 'auto' }}>
       <div style={{
         fontFamily: "'Space Mono', monospace",
-        fontSize: '0.68rem',
+        fontSize: '0.69rem',
         color: '#666',
         letterSpacing: '0.1em',
         textTransform: 'uppercase' as const,

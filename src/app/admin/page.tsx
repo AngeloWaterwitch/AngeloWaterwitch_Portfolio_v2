@@ -76,12 +76,25 @@ export default function AdminPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: '#0a0a0a' }}>
+      <style>{`
+        @media (max-width: 768px) {
+          html, body { overflow-x: hidden; }
+          .adm-head { padding: 0.8rem 1rem !important; }
+          .adm-wrap { flex-direction: column !important; }
+          .adm-side { width: 100% !important; height: auto !important; position: static !important; display: flex !important; flex-direction: row !important; overflow-x: auto !important; overflow-y: hidden !important; padding: 0.4rem 0.5rem !important; border-right: none !important; border-bottom: 1px solid #1a1a1a; }
+          .adm-side button { width: auto !important; flex-shrink: 0; white-space: nowrap; padding: 0.7rem 1rem !important; min-height: 2.5rem; border-left: none !important; border-bottom: 3px solid transparent; }
+          .adm-side button[aria-current='true'] { border-bottom-color: hsl(348,100%,55%) !important; }
+          .adm-main { padding: 1rem !important; }
+        }
+        .adm-side { scrollbar-width: thin; scrollbar-color: #333 transparent; }
+        .adm-side::-webkit-scrollbar { height: 4px; }
+      `}</style>
       <CallErrorBoundary label="Incoming calls">
         <AdminCallListener onSummary={setChatSummary} />
       </CallErrorBoundary>
 
       {/* Header */}
-      <div style={{
+      <div className="adm-head" style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
@@ -141,10 +154,10 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', minHeight: 'calc(100vh - 60px)' }}>
+      <div className="adm-wrap" style={{ display: 'flex', minHeight: 'calc(100vh - 60px)' }}>
 
         {/* Sidebar */}
-        <div style={{
+        <div className="adm-side" style={{
           width: '200px',
           borderRight: '1px solid #1a1a1a',
           background: '#0d0d0d',
@@ -158,6 +171,7 @@ export default function AdminPage() {
           {tabs.map(tab => (
             <button
               key={tab.id}
+              aria-current={activeTab === tab.id ? 'true' : undefined}
               onClick={() => setActiveTab(tab.id)}
               onMouseEnter={e => {
                 if (activeTab !== tab.id) {
@@ -194,7 +208,7 @@ export default function AdminPage() {
         </div>
 
         {/* Main content */}
-        <div style={{ flex: 1, padding: '2rem', overflowY: 'auto' }}>
+        <div className="adm-main" style={{ flex: 1, minWidth: 0, padding: '2rem', overflowY: 'auto' }}>
           {activeTab === 'hero' && <HeroTab data={data} onRefetch={fetchData} />}
           {activeTab === 'about' && <AboutTab data={data} onRefetch={fetchData} />}
           {activeTab === 'skills' && <SkillsTab data={data} onRefetch={fetchData} />}
@@ -469,7 +483,7 @@ function ProjectsTab({ data, onRefetch }: any) {
             </AdminGrid>
 
             <div style={{ marginTop: '1rem' }}>
-              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.8rem' }}>Project Images</div>
+              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.69rem', color: '#555', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.8rem' }}>Project Images</div>
               {project.media && project.media.length > 0 && (
                 <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
                   {project.media.map((m: any) => (
@@ -635,7 +649,7 @@ function TimelineTab({ data, onRefetch }: any) {
                 onChange={v => { const arr = [...timeline]; arr[i] = { ...arr[i], period: v }; setTimeline(arr); }}
               />
               <div>
-                <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Type</div>
+                <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.69rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Type</div>
                 <select
                   value={item.type || 'work'}
                   onChange={e => { const arr = [...timeline]; arr[i] = { ...arr[i], type: e.target.value }; setTimeline(arr); }}
@@ -725,7 +739,7 @@ function TestimonialsTab({ data, onRefetch }: any) {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {pending.map(t => (
             <div key={t.id} style={{ background: '#111', border: '1px solid hsl(348,40%,20%)', borderRadius: '2px', padding: '1.2rem' }}>
-              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: 'hsl(348,100%,55%)', marginBottom: '0.6rem' }}>
+              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.69rem', color: 'hsl(348,100%,55%)', marginBottom: '0.6rem' }}>
                 NEW — {new Date(t.createdAt).toLocaleDateString()}
               </div>
               <p style={{ fontStyle: 'italic', color: '#aaa', fontSize: '0.9rem', marginBottom: '0.8rem' }}>"{t.quote}"</p>
@@ -839,7 +853,7 @@ function MessagesTab({ onRefetch }: any) {
               {!msg.read && (
                 <div style={{ position: 'absolute', top: '1rem', right: '1rem', width: '8px', height: '8px', borderRadius: '50%', background: 'hsl(348,100%,55%)' }} />
               )}
-              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: '#555', marginBottom: '0.5rem' }}>
+              <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.69rem', color: '#555', marginBottom: '0.5rem' }}>
                 {new Date(msg.createdAt).toLocaleDateString()} {new Date(msg.createdAt).toLocaleTimeString()}
                 {msg.read && <span style={{ marginLeft: '0.8rem', color: '#4caf50' }}>✓ Read</span>}
               </div>
@@ -923,7 +937,7 @@ function BrandingTab({ data, onRefetch }: any) {
       </AdminGrid>
 
       <div style={{ marginBottom: '1.5rem' }}>
-        <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.8rem' }}>
+        <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.69rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.8rem' }}>
           Logo Image (drag & drop any image format)
         </div>
         {form.logoUrl && (
@@ -947,7 +961,7 @@ function BrandingTab({ data, onRefetch }: any) {
 
       <AdminLabel>Browser Tab Icon (Favicon)</AdminLabel>
       <div style={{ marginBottom: '1.5rem' }}>
-        <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
+        <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.69rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.5rem' }}>
           Square PNG recommended — 32x32 or 64x64px
         </div>
         {form.faviconUrl && (
@@ -972,7 +986,7 @@ function BrandingTab({ data, onRefetch }: any) {
             setForm((prev: any) => ({ ...prev, faviconUrl: url }));
           }}
         />
-        <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.65rem', color: '#555', marginTop: '0.5rem' }}>
+        <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.69rem', color: '#555', marginTop: '0.5rem' }}>
           Click Save below to apply the favicon site-wide.
         </div>
       </div>
@@ -993,7 +1007,7 @@ function BrandingTab({ data, onRefetch }: any) {
             }}
           >
             <div style={{ fontFamily: `'${font}', monospace`, fontSize: '1rem', marginBottom: '0.3rem' }}>Aa Bb Cc</div>
-            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.65rem', color: '#666' }}>{font}</div>
+            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.69rem', color: '#666' }}>{font}</div>
           </div>
         ))}
       </div>
@@ -1159,7 +1173,7 @@ function ResumeTab({ data, onRefetch }: any) {
                     <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', color: '#888', marginBottom: '0.5rem', lineHeight: 1.5 }}>
                       {r.reason}
                     </div>
-                    <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.65rem', color: '#555' }}>
+                    <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.69rem', color: '#555' }}>
                       {new Date(r.createdAt).toLocaleString('en-ZA', { timeZone: 'Africa/Johannesburg' })}
                     </div>
                   </div>
@@ -1174,7 +1188,7 @@ function ResumeTab({ data, onRefetch }: any) {
                         border: 'none',
                         borderRadius: '1px',
                         fontFamily: "'Space Mono', monospace",
-                        fontSize: '0.68rem',
+                        fontSize: '0.69rem',
                         letterSpacing: '0.06em',
                         cursor: 'pointer',
                         opacity: actionLoading === r.token + 'approve' ? 0.6 : 1,
@@ -1192,7 +1206,7 @@ function ResumeTab({ data, onRefetch }: any) {
                         border: 'none',
                         borderRadius: '1px',
                         fontFamily: "'Space Mono', monospace",
-                        fontSize: '0.68rem',
+                        fontSize: '0.69rem',
                         letterSpacing: '0.06em',
                         cursor: 'pointer',
                         opacity: actionLoading === r.token + 'deny' ? 0.6 : 1,
@@ -1236,13 +1250,13 @@ function ResumeTab({ data, onRefetch }: any) {
                     <div style={{ fontFamily: "'Syne', sans-serif", fontSize: '0.82rem', color: '#f0ede8', marginBottom: '0.2rem' }}>
                       {r.email}
                     </div>
-                    <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.65rem', color: '#555' }}>
+                    <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.69rem', color: '#555' }}>
                       {new Date(r.createdAt).toLocaleString('en-ZA', { timeZone: 'Africa/Johannesburg' })}
                     </div>
                   </div>
                   <div style={{
                     fontFamily: "'Space Mono', monospace",
-                    fontSize: '0.65rem',
+                    fontSize: '0.69rem',
                     letterSpacing: '0.1em',
                     color: statusColor[r.status] ?? '#888',
                     textTransform: 'uppercase',
@@ -1392,7 +1406,7 @@ function ThemeTab({ data, onRefetch }: any) {
               <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: preset.primaryLight }} />
               <div style={{ width: '20px', height: '20px', borderRadius: '50%', background: preset.bgDark3 }} />
             </div>
-            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: preset.textLight, letterSpacing: '0.05em' }}>
+            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.69rem', color: preset.textLight, letterSpacing: '0.05em' }}>
               {preset.name}
             </div>
           </div>
@@ -1411,7 +1425,7 @@ function ThemeTab({ data, onRefetch }: any) {
       }}>
         {colorFields.map(field => (
           <div key={field.key} style={{ background: '#111', border: '1px solid #1a1a1a', borderRadius: '2px', padding: '1rem' }}>
-            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.6rem' }}>
+            <div style={{ fontFamily: "'Space Mono', monospace", fontSize: '0.69rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.6rem' }}>
               {field.label}
             </div>
             <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center' }}>

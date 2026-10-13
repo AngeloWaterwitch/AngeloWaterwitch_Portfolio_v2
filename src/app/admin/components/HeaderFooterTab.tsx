@@ -10,7 +10,7 @@ import { DEFAULT_HEADINGS, HEADING_SECTION_IDS, type SiteSettingsData } from '@/
 
 const smallBtn: React.CSSProperties = {
   padding: '0.4rem 0.9rem', background: 'transparent', border: '1px solid #333', color: '#bbb',
-  fontFamily: "'Space Mono', monospace", fontSize: '0.68rem', letterSpacing: '0.08em', textTransform: 'uppercase',
+  fontFamily: "'Space Mono', monospace", fontSize: '0.69rem', letterSpacing: '0.08em', textTransform: 'uppercase',
   cursor: 'pointer', borderRadius: '1px',
 };
 
