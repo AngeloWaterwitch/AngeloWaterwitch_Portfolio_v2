@@ -61,7 +61,7 @@ export default function Hero({ hero, resume }: any) {
           transition={{ duration: 0.7, delay: 0.2 }}
           style={{
             fontFamily: 'var(--font-display)',
-            fontSize: 'clamp(2.8rem, 10vw, 7rem)',
+            fontSize: 'clamp(1.9rem, 9vw, 7rem)',
             fontWeight: 800,
             lineHeight: 0.95,
             letterSpacing: '-0.03em',
