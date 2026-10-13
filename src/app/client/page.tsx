@@ -16,9 +16,9 @@ import { loadWorkData } from '@/lib/worklog';
 export const dynamic = 'force-dynamic';
 
 const mono: React.CSSProperties = { fontFamily: "'Space Mono', monospace" };
-const label: React.CSSProperties = { ...mono, fontSize: '0.68rem', color: 'var(--cr-muted)', letterSpacing: '0.15em', textTransform: 'uppercase' };
+const label: React.CSSProperties = { ...mono, fontSize: '0.72rem', color: 'var(--cr-muted)', letterSpacing: '0.15em', textTransform: 'uppercase' };
 
-const dl: React.CSSProperties = { ...mono, fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#ddd', border: '1px solid #3a3a3a', padding: '0.5rem 1rem', textDecoration: 'none', borderRadius: '1px' };
+const dl: React.CSSProperties = { ...mono, fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#ddd', border: '1px solid #3a3a3a', padding: '0.5rem 1rem', minHeight: '2.5rem', display: 'inline-flex', alignItems: 'center', textDecoration: 'none', borderRadius: '1px' };
 
 const badgeColor: Record<string, string> = {
   QUOTED: '#9a9a9a', DEPOSIT_PENDING: '#e0a030', IN_PROGRESS: '#3fa7ff', IN_REVIEW: '#b58cff', COMPLETED: '#4caf50', CANCELLED: '#777',
@@ -128,7 +128,7 @@ export default async function ClientDashboard() {
                     <dt style={label}>Deposit</dt>
                     <dd style={{ fontWeight: 700, marginTop: '0.3rem' }}>
                       {formatRands(p.depositCents, p.currency)}{' '}
-                      <span style={{ ...mono, fontSize: '0.68rem', color: p.depositPaidAt ? '#4caf50' : '#e0a030' }}>
+                      <span style={{ ...mono, fontSize: '0.72rem', color: p.depositPaidAt ? '#4caf50' : '#e0a030' }}>
                         {p.depositPaidAt ? `Paid ${formatDate(p.depositPaidAt)}` : 'Due'}
                       </span>
                     </dd>
@@ -159,7 +159,7 @@ export default async function ClientDashboard() {
                     {p.updates.map((u) => (
                       <li key={u.id} style={{ position: 'relative', padding: '0 0 1.4rem 1.2rem' }}>
                         <span aria-hidden style={{ position: 'absolute', left: '-5px', top: '0.35rem', width: '9px', height: '9px', borderRadius: '50%', background: 'var(--cr-light, #ff1a47)' }} />
-                        <div style={{ ...mono, fontSize: '0.68rem', color: 'var(--cr-muted)' }}>
+                        <div style={{ ...mono, fontSize: '0.72rem', color: 'var(--cr-muted)' }}>
                           {formatDateTime(u.createdAt)}{u.progress !== null ? ` · ${u.progress}% complete` : ''}
                         </div>
                         <div style={{ fontWeight: 700, marginTop: '0.2rem' }}>{u.title}</div>
@@ -195,7 +195,7 @@ export default async function ClientDashboard() {
                     <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
                       {w.project.logEntries.slice(0, 40).map((e) => (
                         <li key={e.id} style={{ display: 'grid', gridTemplateColumns: 'minmax(120px, 160px) 1fr', gap: '0.8rem', padding: '0.45rem 0', borderTop: '1px solid #1f1f1f', fontSize: '0.85rem' }}>
-                          <span style={{ ...mono, fontSize: '0.68rem', color: 'var(--cr-muted)' }}>{formatDateTime(e.createdAt)}</span>
+                          <span style={{ ...mono, fontSize: '0.72rem', color: 'var(--cr-muted)' }}>{formatDateTime(e.createdAt)}</span>
                           <span style={{ color: '#ccc' }}>{e.message}</span>
                         </li>
                       ))}

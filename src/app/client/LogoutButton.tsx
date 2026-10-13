@@ -19,7 +19,7 @@ export default function LogoutButton() {
       type="button"
       onClick={logout}
       disabled={busy}
-      style={{ background: 'transparent', border: '1px solid #333', color: '#bbb', padding: '0.5rem 1rem', fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: busy ? 'not-allowed' : 'pointer', borderRadius: '1px' }}
+      style={{ background: 'transparent', border: '1px solid #333', color: '#bbb', padding: '0.5rem 1rem', minHeight: '2.5rem', fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', cursor: busy ? 'not-allowed' : 'pointer', borderRadius: '1px' }}
     >
       {busy ? 'Signing out...' : 'Sign out'}
     </button>

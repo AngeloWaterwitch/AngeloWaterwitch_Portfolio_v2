@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation';
 import type { DocContent } from '@/lib/legal/types';
 
 const mono: React.CSSProperties = { fontFamily: "'Space Mono', monospace" };
-const label: React.CSSProperties = { ...mono, fontSize: '0.68rem', color: 'var(--cr-muted)', letterSpacing: '0.15em', textTransform: 'uppercase' };
-const dl: React.CSSProperties = { ...mono, fontSize: '0.7rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#ddd', border: '1px solid #3a3a3a', padding: '0.4rem 0.8rem', textDecoration: 'none', borderRadius: '1px', whiteSpace: 'nowrap' };
+const label: React.CSSProperties = { ...mono, fontSize: '0.72rem', color: 'var(--cr-muted)', letterSpacing: '0.15em', textTransform: 'uppercase' };
+const dl: React.CSSProperties = { ...mono, fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#ddd', border: '1px solid #3a3a3a', padding: '0.4rem 0.8rem', minHeight: '2.5rem', display: 'inline-flex', alignItems: 'center', textDecoration: 'none', borderRadius: '1px', whiteSpace: 'nowrap' };
 
 export type ClientDoc = {
   id: string; type: string; title: string; version: number; requiresAcceptance: boolean;
@@ -103,7 +103,7 @@ export default function DocumentsPanel({ docs, clientName }: { docs: ClientDoc[]
             <label htmlFor="sign-name" style={{ ...label, display: 'block', margin: '1.1rem 0 0.4rem' }}>Type your full name to sign: {clientName}</label>
             <input id="sign-name" value={name} onChange={(e) => setName(e.target.value)} autoComplete="name" maxLength={120} placeholder={clientName}
               style={{ width: '100%', maxWidth: '420px', background: '#0a0a0a', border: '1px solid #2a2a2a', color: 'var(--cr-text, #f0ede8)', padding: '0.8rem 1rem', fontFamily: "'Syne', sans-serif", fontSize: '0.95rem', borderRadius: '1px' }} />
-            <p style={{ ...mono, fontSize: '0.66rem', color: 'var(--cr-muted)', lineHeight: 1.6, marginTop: '0.6rem' }}>
+            <p style={{ ...mono, fontSize: '0.72rem', color: 'var(--cr-muted)', lineHeight: 1.6, marginTop: '0.6rem' }}>
               Your acceptance is recorded with the date, time and your device&apos;s IP address, and has the same effect as a signature.
             </p>
             {error && <div role="alert" style={{ ...mono, fontSize: '0.74rem', color: 'var(--cr-light, #ff1a47)', marginTop: '0.7rem' }}>{error}</div>}
@@ -121,8 +121,8 @@ export default function DocumentsPanel({ docs, clientName }: { docs: ClientDoc[]
             <div>
               <span style={{ fontWeight: 700 }}>{d.title}</span>
               {d.requiresAcceptance && (d.acceptedAt
-                ? <span style={{ ...mono, fontSize: '0.66rem', color: '#4caf50', marginLeft: '0.6rem' }}>✓ accepted {new Date(d.acceptedAt).toLocaleDateString('en-ZA', { timeZone: 'Africa/Johannesburg' })}</span>
-                : <span style={{ ...mono, fontSize: '0.66rem', color: '#e0a030', marginLeft: '0.6rem' }}>waiting for you</span>)}
+                ? <span style={{ ...mono, fontSize: '0.72rem', color: '#4caf50', marginLeft: '0.6rem' }}>✓ accepted {new Date(d.acceptedAt).toLocaleDateString('en-ZA', { timeZone: 'Africa/Johannesburg' })}</span>
+                : <span style={{ ...mono, fontSize: '0.72rem', color: '#e0a030', marginLeft: '0.6rem' }}>waiting for you</span>)}
             </div>
             <a href={`/api/client/documents/${d.id}/pdf`} style={dl}>Download PDF</a>
           </li>

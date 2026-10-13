@@ -106,7 +106,7 @@ export default function ProjectLive({ projectId, initial, serverNow }: { project
           <>
             <span style={{ fontWeight: 700 }}>Angelo is working on this right now</span>
             <span style={{ ...mono, fontSize: '0.8rem', color: '#4caf50' }}>{clock(elapsed)}</span>
-            {a.overtime && <span style={{ ...mono, fontSize: '0.66rem', color: '#e0a030', border: '1px solid #e0a030', padding: '0.1rem 0.5rem', borderRadius: '999px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Overtime you confirmed</span>}
+            {a.overtime && <span style={{ ...mono, fontSize: '0.72rem', color: '#e0a030', border: '1px solid #e0a030', padding: '0.1rem 0.5rem', borderRadius: '999px', textTransform: 'uppercase', letterSpacing: '0.1em' }}>Overtime you confirmed</span>}
           </>
         ) : (
           <span style={{ color: '#aaa', fontSize: '0.9rem' }}>
@@ -129,7 +129,7 @@ export default function ProjectLive({ projectId, initial, serverNow }: { project
           <p style={{ color: 'var(--cr-muted)', fontSize: '0.8rem', lineHeight: 1.6, marginTop: '0.8rem' }}>
             Please tell us whether you require this. Overtime is only recorded as requested by you if you choose &ldquo;Yes&rdquo;.
           </p>
-          <label htmlFor={'ot-note-' + o.id} style={{ display: 'block', ...mono, fontSize: '0.66rem', color: 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', margin: '0.9rem 0 0.4rem' }}>Note (optional)</label>
+          <label htmlFor={'ot-note-' + o.id} style={{ display: 'block', ...mono, fontSize: '0.72rem', color: 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', margin: '0.9rem 0 0.4rem' }}>Note (optional)</label>
           <textarea id={'ot-note-' + o.id} value={note} onChange={(e) => setNote(e.target.value)} maxLength={500} rows={2}
             style={{ width: '100%', background: '#0a0a0a', border: '1px solid #2a2a2a', color: 'var(--cr-text, #f0ede8)', padding: '0.6rem 0.8rem', fontFamily: "'Syne', sans-serif", fontSize: '0.85rem', borderRadius: '1px', resize: 'vertical' }} />
           {error && <div role="alert" style={{ ...mono, fontSize: '0.72rem', color: 'var(--cr-light, #ff1a47)', marginTop: '0.6rem' }}>{error}</div>}
