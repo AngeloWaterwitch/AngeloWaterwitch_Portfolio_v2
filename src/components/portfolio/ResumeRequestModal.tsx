@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Icon } from '@/components/Icon';
 
 interface Props {
   resumeLabel?: string;
@@ -107,7 +108,7 @@ export default function ResumeRequestModal({ resumeLabel, onClose }: Props) {
         >
           {status === 'success' ? (
             <div style={{ textAlign: 'center' }}>
-              <div style={{ fontSize: '2rem', marginBottom: '1rem' }}>✅</div>
+              <div style={{ marginBottom: '1rem', color: '#4caf50' }}><Icon name="checkCircle" size={40} /></div>
               <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.2rem', color: 'var(--cr-light)', marginBottom: '0.75rem' }}>
                 Request Sent
               </h3>

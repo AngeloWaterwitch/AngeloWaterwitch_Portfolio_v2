@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 import { DEFAULT_HEADINGS } from '@/lib/siteSettings';
+import { Icon } from '@/components/Icon';
  
 export default function Testimonials({ testimonials, heading }: any) {
   const h = heading ?? DEFAULT_HEADINGS.testimonials;
@@ -74,7 +75,7 @@ export default function Testimonials({ testimonials, heading }: any) {
             <button onClick={() => setShowForm(false)} aria-label="Close" style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'transparent', border: 'none', color: 'var(--cr-muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
             {submitted ? (
               <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-                <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🎉</div>
+                <div style={{ marginBottom: '1rem', color: 'var(--cr-light)' }}><Icon name="sparkles" size={44} /></div>
                 <p style={{ fontFamily: 'var(--font-display)', fontSize: '1.1rem', fontWeight: 700, marginBottom: '0.5rem', color: 'var(--cr-text)' }}>Thank you!</p>
                 <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.78rem', color: 'var(--cr-muted)', marginBottom: '1.5rem' }}>Your testimonial has been submitted for review.</p>
                 <button onClick={() => setShowForm(false)} style={{ padding: '0.7rem 1.5rem', background: 'var(--cr-primary)', color: '#fff', border: 'none', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.85rem', borderRadius: '1px', cursor: 'pointer' }}>Close</button>

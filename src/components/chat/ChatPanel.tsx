@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRealtimePing } from './useRealtimePing';
 import { startRinging, stopRinging } from './ringtone';
+import { Icon } from '@/components/Icon';
 
 // livekit-client is large, so it is only downloaded when a call actually starts.
 const CallOverlay = dynamic(() => import('./CallOverlay'), { ssr: false });
@@ -186,7 +187,7 @@ export default function ChatPanel(props: {
 
       {ringing && call && (
         <div role="alert" style={{ padding: '0.8rem 0.9rem', background: 'rgba(76,175,80,0.12)', borderBottom: '1px solid rgba(76,175,80,0.4)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.6rem', flexWrap: 'wrap' }}>
-          <span style={{ fontWeight: 700 }}>📞 Incoming {call.kind === 'VIDEO' ? 'video' : 'voice'} call</span>
+          <span style={{ fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '0.4rem' }}><Icon name="phone" size={16} /> Incoming {call.kind === 'VIDEO' ? 'video' : 'voice'} call</span>
           <span style={{ display: 'flex', gap: '0.4rem' }}>
             <button type="button" onClick={answer} style={btn('#2e7d32')}>Answer</button>
             <button type="button" onClick={decline} style={btn('#7a1020')}>Decline</button>

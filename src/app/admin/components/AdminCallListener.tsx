@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRealtimePing } from '@/components/chat/useRealtimePing';
 import { startRinging, stopRinging } from '@/components/chat/ringtone';
+import { Icon } from '@/components/Icon';
 
 const CallOverlay = dynamic(() => import('@/components/chat/CallOverlay'), { ssr: false });
 
@@ -106,7 +107,7 @@ export function AdminCallListener({ onSummary }: { onSummary: (s: AdminSummary) 
     <>
       {ringing && first && (
         <div role="alertdialog" aria-label={`Incoming call from ${first.clientName}`} style={{ position: 'fixed', top: '1rem', left: '1rem', right: '1rem', marginLeft: 'auto', maxWidth: '360px', zIndex: 2500, boxSizing: 'border-box', background: '#17171c', border: '1px solid rgba(76,175,80,0.6)', boxShadow: '0 10px 40px rgba(0,0,0,0.7)', padding: '1rem 1.1rem', color: '#f0ede8', fontFamily: "'Syne', sans-serif" }}>
-          <div style={{ fontFamily: mono, fontSize: '0.69rem', color: '#4caf50', letterSpacing: '0.15em', textTransform: 'uppercase' }}>📞 Incoming {first.kind === 'VIDEO' ? 'video' : 'voice'} call</div>
+          <div style={{ fontFamily: mono, fontSize: '0.69rem', color: '#4caf50', letterSpacing: '0.15em', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '0.4rem' }}><Icon name="phone" size={14} /> Incoming {first.kind === 'VIDEO' ? 'video' : 'voice'} call</div>
           <div style={{ fontSize: '1.2rem', fontWeight: 800, margin: '0.4rem 0 0.9rem' }}>{first.clientName}</div>
           <div style={{ display: 'flex', gap: '0.6rem' }}>
             <button type="button" style={btn('#2e7d32')} onClick={async () => { setError(''); seq.current++; try { await join(await act(first.id, 'accept'), first.clientName); } catch { setError('No connection.'); } refresh(); }}>Answer</button>
