@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { formatRands } from '@/lib/format';
 
 const mono: React.CSSProperties = { fontFamily: "'Space Mono', monospace" };
-const label: React.CSSProperties = { ...mono, fontSize: '0.66rem', color: 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', margin: '1rem 0 0.4rem' };
+const label: React.CSSProperties = { ...mono, fontSize: '0.72rem', color: 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', margin: '1rem 0 0.4rem' };
 
 type Props = {
   projectId: string;
@@ -60,7 +60,7 @@ export default function CancelPanel(p: Props) {
     <div style={{ marginTop: '1.6rem', paddingTop: '1.2rem', borderTop: '1px solid #232323' }}>
       {!open ? (
         <button type="button" onClick={() => setOpen(true)}
-          style={{ ...mono, fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', background: 'transparent', color: '#aaa', border: '1px solid #3a3a3a', padding: '0.55rem 1rem', cursor: 'pointer', borderRadius: '1px' }}>
+          style={{ ...mono, fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', background: 'transparent', color: '#aaa', border: '1px solid #3a3a3a', padding: '0.55rem 1rem', minHeight: '2.5rem', cursor: 'pointer', borderRadius: '1px' }}>
           Cancel this project
         </button>
       ) : (

@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { formatRands } from '@/lib/format';
 
 const mono: React.CSSProperties = { fontFamily: "'Space Mono', monospace" };
-const label: React.CSSProperties = { ...mono, fontSize: '0.68rem', color: 'var(--cr-muted)', letterSpacing: '0.15em', textTransform: 'uppercase' };
+const label: React.CSSProperties = { ...mono, fontSize: '0.72rem', color: 'var(--cr-muted)', letterSpacing: '0.15em', textTransform: 'uppercase' };
 
 type Props = {
   projectId: string;
@@ -94,7 +94,7 @@ export default function PaymentPanel(p: Props) {
       {row('Final balance', balance, finalState, 'FINAL', p.finalPaidAt,
         'The website goes live and the files are handed over after this payment.')}
       {(depositState.kind === 'due' || finalState.kind === 'due') && p.payfastReady && (
-        <p style={{ ...mono, fontSize: '0.66rem', color: 'var(--cr-muted)', lineHeight: 1.6, marginTop: '0.4rem' }}>
+        <p style={{ ...mono, fontSize: '0.72rem', color: 'var(--cr-muted)', lineHeight: 1.6, marginTop: '0.4rem' }}>
           Payments are made on PayFast&apos;s secure page (card or Instant EFT). Your card or bank details never reach this website.
         </p>
       )}

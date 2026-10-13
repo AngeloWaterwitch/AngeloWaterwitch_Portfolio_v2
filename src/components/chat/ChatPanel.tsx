@@ -212,7 +212,7 @@ export default function ChatPanel(props: {
         {messages.map((m, i) => {
           const prev = messages[i - 1];
           const newDay = !prev || day(prev.createdAt) !== day(m.createdAt);
-          const sep = newDay && <div style={{ textAlign: 'center', fontFamily: mono, fontSize: '0.64rem', color: '#777', margin: '0.5rem 0', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{day(m.createdAt)}</div>;
+          const sep = newDay && <div style={{ textAlign: 'center', fontFamily: mono, fontSize: '0.72rem', color: '#777', margin: '0.5rem 0', textTransform: 'uppercase', letterSpacing: '0.1em' }}>{day(m.createdAt)}</div>;
           if (m.sender === 'SYSTEM') {
             return <div key={m.id}>{sep}<div style={{ textAlign: 'center', fontFamily: mono, fontSize: '0.7rem', color: '#9a9a9a' }}>{m.body} · {time(m.createdAt)}</div></div>;
           }
@@ -224,7 +224,7 @@ export default function ChatPanel(props: {
               <div style={{ display: 'flex', justifyContent: isMine ? 'flex-end' : 'flex-start' }}>
                 <div style={{ maxWidth: '82%', padding: '0.55rem 0.8rem', borderRadius: '10px', background: isMine ? 'hsl(348,100%,36%)' : '#24242a', color: '#fff', opacity: m.pending ? 0.65 : 1, fontSize: '0.9rem', lineHeight: 1.5, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                   {m.body}
-                  <div style={{ fontFamily: mono, fontSize: '0.6rem', opacity: 0.7, marginTop: '0.25rem', textAlign: 'right' }}>
+                  <div style={{ fontFamily: mono, fontSize: '0.72rem', opacity: 0.7, marginTop: '0.25rem', textAlign: 'right' }}>
                     {m.pending ? 'Sending...' : time(m.createdAt)}{lastMine && m.readAt ? ' · Seen' : ''}
                   </div>
                 </div>

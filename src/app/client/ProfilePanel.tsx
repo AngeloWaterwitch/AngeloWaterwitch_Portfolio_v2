@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 const mono: React.CSSProperties = { fontFamily: "'Space Mono', monospace" };
-const label: React.CSSProperties = { ...mono, fontSize: '0.66rem', color: 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', margin: '0.9rem 0 0.35rem' };
+const label: React.CSSProperties = { ...mono, fontSize: '0.72rem', color: 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', display: 'block', margin: '0.9rem 0 0.35rem' };
 const input: React.CSSProperties = { width: '100%', background: '#0a0a0a', border: '1px solid #2a2a2a', color: 'var(--cr-text, #f0ede8)', padding: '0.7rem 0.9rem', fontFamily: "'Syne', sans-serif", fontSize: '0.9rem', borderRadius: '1px' };
-const dl: React.CSSProperties = { ...mono, fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#ddd', border: '1px solid #3a3a3a', padding: '0.55rem 1rem', textDecoration: 'none', borderRadius: '1px', display: 'inline-block' };
+const dl: React.CSSProperties = { ...mono, fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', color: '#ddd', border: '1px solid #3a3a3a', padding: '0.55rem 1rem', minHeight: '2.5rem', textDecoration: 'none', borderRadius: '1px', display: 'inline-block' };
 
 type Props = { name: string; email: string; phone: string; company: string; hasOpenProjects: boolean; depositPaid: boolean };
 
@@ -50,7 +50,7 @@ export default function ProfilePanel(p: Props) {
 
   return (
     <section aria-labelledby="profile-h" style={{ background: 'var(--cr-bg3, #1a1a1a)', border: '1px solid var(--cr-bg4, #222)', borderRadius: '2px', padding: 'clamp(1.1rem, 4vw, 1.8rem)', marginTop: '1.5rem' }}>
-      <h2 id="profile-h" style={{ ...mono, fontSize: '0.68rem', color: 'var(--cr-muted)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Your profile &amp; data</h2>
+      <h2 id="profile-h" style={{ ...mono, fontSize: '0.72rem', color: 'var(--cr-muted)', letterSpacing: '0.15em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Your profile &amp; data</h2>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '0 1.2rem' }}>
         <div><label htmlFor="pf-name" style={label}>Full name</label><input id="pf-name" value={f.name} onChange={set('name')} autoComplete="name" maxLength={100} style={input} /></div>
@@ -58,11 +58,11 @@ export default function ProfilePanel(p: Props) {
         <div><label htmlFor="pf-phone" style={label}>Phone</label><input id="pf-phone" value={f.phone} onChange={set('phone')} autoComplete="tel" maxLength={40} style={input} /></div>
         <div><label htmlFor="pf-company" style={label}>Company</label><input id="pf-company" value={f.company} onChange={set('company')} autoComplete="organization" maxLength={120} style={input} /></div>
       </div>
-      <p style={{ ...mono, fontSize: '0.66rem', color: 'var(--cr-muted)', lineHeight: 1.6, marginTop: '0.8rem' }}>
+      <p style={{ ...mono, fontSize: '0.72rem', color: 'var(--cr-muted)', lineHeight: 1.6, marginTop: '0.8rem' }}>
         Documents you have already signed keep the details they were signed with.
       </p>
       <button type="button" disabled={!dirty || saving} onClick={save}
-        style={{ marginTop: '0.8rem', padding: '0.7rem 1.3rem', background: dirty && !saving ? 'var(--cr-primary, #cc0033)' : '#2a2a2a', color: '#fff', border: 'none', fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', borderRadius: '1px', cursor: dirty && !saving ? 'pointer' : 'not-allowed' }}>
+        style={{ marginTop: '0.8rem', padding: '0.7rem 1.3rem', minHeight: '2.5rem', background: dirty && !saving ? 'var(--cr-primary, #cc0033)' : '#2a2a2a', color: '#fff', border: 'none', fontFamily: "'Syne', sans-serif", fontWeight: 700, fontSize: '0.78rem', letterSpacing: '0.1em', textTransform: 'uppercase', borderRadius: '1px', cursor: dirty && !saving ? 'pointer' : 'not-allowed' }}>
         {saving ? 'Saving...' : 'Save changes'}
       </button>
       {msg && <span role="status" style={{ ...mono, fontSize: '0.74rem', color: msg.ok ? '#6fcf73' : 'var(--cr-light, #ff1a47)', marginLeft: '1rem' }}>{msg.text}</span>}
@@ -83,20 +83,20 @@ export default function ProfilePanel(p: Props) {
               You can erase your personal information and close your access at any time.
             </p>
             <button type="button" onClick={() => setOpenDel(true)}
-              style={{ ...mono, fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', background: 'transparent', color: '#ff7a95', border: '1px solid #7a1f33', padding: '0.55rem 1rem', cursor: 'pointer', borderRadius: '1px' }}>
+              style={{ ...mono, fontSize: '0.72rem', letterSpacing: '0.1em', textTransform: 'uppercase', background: 'transparent', color: '#ff7a95', border: '1px solid #7a1f33', padding: '0.55rem 1rem', minHeight: '2.5rem', cursor: 'pointer', borderRadius: '1px' }}>
               Delete my profile and data
             </button>
           </>
         ) : (
           <div role="group" aria-label="Delete my profile and data" style={{ border: '1px solid #b3243d', background: 'rgba(179,36,61,0.07)', padding: '1.1rem 1.2rem', borderRadius: '2px' }}>
             <p style={{ fontSize: '0.92rem', lineHeight: 1.7, fontWeight: 700 }}>This cannot be undone.</p>
-            <p style={{ ...mono, fontSize: '0.66rem', color: 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: '0.9rem' }}>Deleted straight away</p>
+            <p style={{ ...mono, fontSize: '0.72rem', color: 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: '0.9rem' }}>Deleted straight away</p>
             <ul style={{ margin: '0.4rem 0', paddingLeft: '1.2rem', fontSize: '0.88rem', lineHeight: 1.7, color: '#ddd' }}>
               <li>Your name, email, phone and company</li>
               <li>Your chat messages, call records, work logs and project updates</li>
               <li>Your access: you will be signed out and the portal closes</li>
             </ul>
-            <p style={{ ...mono, fontSize: '0.66rem', color: 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: '0.9rem' }}>Kept for 5 years, because the law requires it</p>
+            <p style={{ ...mono, fontSize: '0.72rem', color: 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginTop: '0.9rem' }}>Kept for 5 years, because the law requires it</p>
             <ul style={{ margin: '0.4rem 0', paddingLeft: '1.2rem', fontSize: '0.88rem', lineHeight: 1.7, color: '#ddd' }}>
               <li>Your signed agreement, quote, receipts and payment records</li>
               <li>They are locked away, used for nothing else, and deleted when the 5 years end.</li>
