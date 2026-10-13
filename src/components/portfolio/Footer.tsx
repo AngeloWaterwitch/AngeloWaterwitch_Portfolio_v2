@@ -3,18 +3,18 @@
 import { safeUrl, DEFAULT_SETTINGS } from '@/lib/siteSettings';
 
 const colHeading: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--cr-muted)',
+  fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--cr-muted)',
   letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '1rem',
 };
 const list: React.CSSProperties = {
   listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.6rem',
 };
 const linkStyle: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.65rem, 1.5vw, 0.75rem)', color: 'var(--cr-muted)',
+  fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.72rem, 1.5vw, 0.78rem)', color: 'var(--cr-muted)',
   letterSpacing: '0.08em', textTransform: 'uppercase', textDecoration: 'none', transition: 'color 0.2s',
 };
 const smallText: React.CSSProperties = {
-  fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.62rem, 1.5vw, 0.7rem)', color: 'var(--cr-muted)', letterSpacing: '0.08em',
+  fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.72rem, 1.5vw, 0.78rem)', color: 'var(--cr-muted)', letterSpacing: '0.08em',
 };
 
 const hoverOn = (e: React.MouseEvent<HTMLAnchorElement>) => { e.currentTarget.style.color = 'var(--cr-light)'; };
@@ -45,7 +45,7 @@ export default function Footer({ sections, contact, branding, settings }: any) {
               ) : branding?.logoText || 'AW.'}
             </div>
             {s.footerTagline && (
-              <p style={{ ...smallText, fontSize: 'clamp(0.65rem, 1.5vw, 0.72rem)', maxWidth: '220px', lineHeight: 1.6 }}>
+              <p style={{ ...smallText, fontSize: 'clamp(0.72rem, 1.5vw, 0.78rem)', maxWidth: '220px', lineHeight: 1.6 }}>
                 {s.footerTagline}
               </p>
             )}

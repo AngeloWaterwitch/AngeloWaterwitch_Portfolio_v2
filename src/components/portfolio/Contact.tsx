@@ -82,7 +82,7 @@ export default function Contact({ contact, heading }: any) {
             style={{ display: 'flex', flexWrap: 'wrap', gap: '0.8rem', marginTop: '2rem' }}>
             {socials.map((s, i) => (
               <a key={i} href={s.url} target="_blank" rel="noreferrer"
-                style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.65rem, 1.5vw, 0.72rem)', border: '1px solid #333', padding: '0.4rem 0.8rem', borderRadius: '1px', color: '#888', transition: 'all 0.2s', letterSpacing: '0.08em', textDecoration: 'none' }}
+                style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.72rem, 1.5vw, 0.78rem)', border: '1px solid #333', padding: '0.4rem 0.8rem', borderRadius: '1px', color: '#888', transition: 'all 0.2s', letterSpacing: '0.08em', textDecoration: 'none' }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--cr-light)'; e.currentTarget.style.color = 'var(--cr-light)'; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = '#333'; e.currentTarget.style.color = '#888'; }}
               >
@@ -106,14 +106,14 @@ export default function Contact({ contact, heading }: any) {
                 <label htmlFor={'contact-' + field.name} style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: field.error ? 'var(--cr-light)' : 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>{field.label}</label>
                 <input id={'contact-' + field.name} name={field.name} type={field.type} autoComplete={field.autoComplete} aria-invalid={!!field.error} aria-describedby={field.error ? 'contact-' + field.name + '-error' : undefined} placeholder={field.placeholder} value={(form as any)[field.name]} onChange={e => setForm({ ...form, [field.name]: e.target.value })}
                   style={{ width: '100%', background: 'var(--cr-bg)', border: '1px solid ' + (field.error ? 'var(--cr-dim)' : '#222'), color: 'var(--cr-text)', padding: '0.8rem 1rem', fontFamily: 'var(--font-display)', fontSize: 'clamp(0.85rem, 2vw, 0.9rem)', borderRadius: '1px', outline: 'none', boxSizing: 'border-box' }} />
-                {field.error && <div id={'contact-' + field.name + '-error'} role="alert" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--cr-light)', marginTop: '0.3rem' }}>{field.error}</div>}
+                {field.error && <div id={'contact-' + field.name + '-error'} role="alert" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--cr-light)', marginTop: '0.3rem' }}>{field.error}</div>}
               </div>
             ))}
             <div style={{ marginBottom: '1.2rem' }}>
               <label htmlFor="contact-message" style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: errors.message ? 'var(--cr-light)' : 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Message</label>
               <textarea id="contact-message" name="message" aria-invalid={!!errors.message} aria-describedby={errors.message ? 'contact-message-error' : undefined} placeholder="Tell me about your project..." value={form.message} onChange={e => setForm({ ...form, message: e.target.value })} rows={5}
                 style={{ width: '100%', background: 'var(--cr-bg)', border: '1px solid ' + (errors.message ? 'var(--cr-dim)' : '#222'), color: 'var(--cr-text)', padding: '0.8rem 1rem', fontFamily: 'var(--font-display)', fontSize: 'clamp(0.85rem, 2vw, 0.9rem)', borderRadius: '1px', outline: 'none', resize: 'vertical', minHeight: '120px', boxSizing: 'border-box' }} />
-              {errors.message && <div id="contact-message-error" role="alert" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--cr-light)', marginTop: '0.3rem' }}>{errors.message}</div>}
+              {errors.message && <div id="contact-message-error" role="alert" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--cr-light)', marginTop: '0.3rem' }}>{errors.message}</div>}
             </div>
             <button type="submit" disabled={status === 'sending'}
               style={{ width: '100%', padding: '1rem', background: status === 'sending' ? '#333' : 'var(--cr-primary)', color: '#fff', border: 'none', fontFamily: 'var(--font-display)', fontSize: 'clamp(0.8rem, 2vw, 0.85rem)', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', borderRadius: '1px', cursor: status === 'sending' ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}>

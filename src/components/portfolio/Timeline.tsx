@@ -64,9 +64,9 @@ function TimelineItem({ item, index }: any) {
     >
       <div style={{ position: 'absolute', left: '-2rem', top: '4px', width: '14px', height: '14px', borderRadius: '50%', background: hovered ? 'var(--cr-primary)' : 'var(--cr-bg4)', border: '2px solid ' + (hovered ? 'var(--cr-light)' : 'var(--cr-dim)'), transition: 'all 0.2s', zIndex: 1 }} />
       <div style={{ background: hovered ? 'var(--cr-bg3)' : 'var(--cr-bg2)', border: '1px solid ' + (hovered ? 'var(--cr-dim)' : 'var(--cr-bg4)'), borderRadius: '2px', padding: 'clamp(1rem, 3vw, 1.5rem)', transition: 'all 0.2s', transform: hovered ? 'translateX(4px)' : 'translateX(0)' }}>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--cr-light)', letterSpacing: '0.1em', marginBottom: '0.6rem', display: 'inline-block', background: 'var(--cr-dim)', padding: '0.2rem 0.6rem', borderRadius: '1px' }}>{item.period}</div>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--cr-light)', letterSpacing: '0.1em', marginBottom: '0.6rem', display: 'inline-block', background: 'var(--cr-dim)', padding: '0.2rem 0.6rem', borderRadius: '1px' }}>{item.period}</div>
         <h3 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(0.95rem, 2.5vw, 1.1rem)', fontWeight: 700, color: 'var(--cr-text)', marginBottom: '0.3rem' }}>{item.title}</h3>
-        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.65rem, 1.5vw, 0.72rem)', color: 'var(--cr-light)', letterSpacing: '0.08em', marginBottom: '0.8rem' }}>{item.organisation}</div>
+        <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.72rem, 1.5vw, 0.78rem)', color: 'var(--cr-light)', letterSpacing: '0.08em', marginBottom: '0.8rem' }}>{item.organisation}</div>
         <p style={{ fontSize: 'clamp(0.82rem, 2vw, 0.88rem)', color: 'var(--cr-muted)', lineHeight: 1.7 }}>{item.desc}</p>
       </div>
     </motion.div>

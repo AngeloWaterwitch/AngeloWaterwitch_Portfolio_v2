@@ -1,7 +1,7 @@
 'use client';
  
 import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { DEFAULT_HEADINGS } from '@/lib/siteSettings';
  
 export default function Testimonials({ testimonials, heading }: any) {
@@ -11,6 +11,13 @@ export default function Testimonials({ testimonials, heading }: any) {
   const [submitted, setSubmitted] = useState(false);
   const [errors, setErrors] = useState<any>({});
  
+  useEffect(() => {
+    if (!showForm) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setShowForm(false); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [showForm]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: any = {};
@@ -40,7 +47,7 @@ export default function Testimonials({ testimonials, heading }: any) {
           </h2>
           <button
             onClick={() => setShowForm(true)}
-            style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.65rem, 2vw, 0.75rem)', padding: 'clamp(0.4rem, 1.5vw, 0.6rem) clamp(0.8rem, 2vw, 1.2rem)', background: 'transparent', border: '1px solid #333', color: '#888', borderRadius: '1px', cursor: 'pointer', letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'all 0.2s' }}
+            style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.72rem, 2vw, 0.78rem)', padding: 'clamp(0.72rem, 1.5vw, 0.78rem) clamp(0.8rem, 2vw, 1.2rem)', background: 'transparent', border: '1px solid #333', color: '#888', borderRadius: '1px', cursor: 'pointer', letterSpacing: '0.1em', textTransform: 'uppercase', transition: 'all 0.2s' }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--cr-light)'; e.currentTarget.style.color = 'var(--cr-light)'; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = '#333'; e.currentTarget.style.color = '#888'; }}
           >
@@ -49,6 +56,11 @@ export default function Testimonials({ testimonials, heading }: any) {
         </motion.div>
         <motion.div initial={{ opacity: 0, scaleX: 0 }} whileInView={{ opacity: 1, scaleX: 1 }} viewport={{ once: true }} transition={{ duration: 0.4, delay: 0.2 }}
           style={{ width: '3rem', height: '2px', background: 'var(--cr-primary)', marginBottom: '3rem', transformOrigin: 'left' }} />
+        {(!testimonials || testimonials.length === 0) && (
+          <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--cr-muted)', lineHeight: 1.8, maxWidth: '520px' }}>
+            No testimonials yet. Worked with me? Share your experience with the button above.
+          </p>
+        )}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 400px), 1fr))', gap: 'clamp(1rem, 3vw, 1.5rem)' }}>
           {testimonials?.map((t: any, i: number) => (
             <TestimonialCard key={t.id} testimonial={t} index={i} />
@@ -57,9 +69,9 @@ export default function Testimonials({ testimonials, heading }: any) {
       </div>
  
       {showForm && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '2rem' }}>
+        <div role="dialog" aria-modal="true" aria-label="Leave a testimonial" onClick={(e) => { if (e.target === e.currentTarget) setShowForm(false); }} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.85)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: '2rem' }}>
           <div style={{ background: 'var(--cr-bg2)', border: '1px solid var(--cr-bg4)', borderRadius: '2px', padding: '2.5rem', width: '100%', maxWidth: '520px', position: 'relative' }}>
-            <button onClick={() => setShowForm(false)} style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'transparent', border: 'none', color: 'var(--cr-muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
+            <button onClick={() => setShowForm(false)} aria-label="Close" style={{ position: 'absolute', top: '1rem', right: '1rem', background: 'transparent', border: 'none', color: 'var(--cr-muted)', fontSize: '1.2rem', cursor: 'pointer' }}>✕</button>
             {submitted ? (
               <div style={{ textAlign: 'center', padding: '2rem 0' }}>
                 <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>🎉</div>
@@ -80,14 +92,14 @@ export default function Testimonials({ testimonials, heading }: any) {
                     <label style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>{field.label}</label>
                     <input type="text" placeholder={field.placeholder} value={(form as any)[field.name]} onChange={e => setForm({ ...form, [field.name]: e.target.value })}
                       style={{ width: '100%', background: 'var(--cr-bg)', border: '1px solid ' + (field.error ? 'var(--cr-dim)' : 'var(--cr-bg4)'), color: 'var(--cr-text)', padding: '0.8rem 1rem', fontFamily: 'var(--font-display)', fontSize: '0.9rem', borderRadius: '1px', outline: 'none', boxSizing: 'border-box' }} />
-                    {field.error && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--cr-light)', marginTop: '0.3rem' }}>{field.error}</div>}
+                    {field.error && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--cr-light)', marginTop: '0.3rem' }}>{field.error}</div>}
                   </div>
                 ))}
                 <div style={{ marginBottom: '1.2rem' }}>
                   <label style={{ display: 'block', fontFamily: 'var(--font-mono)', fontSize: '0.7rem', color: 'var(--cr-muted)', letterSpacing: '0.12em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Your Testimonial *</label>
                   <textarea placeholder="Tell others about your experience..." value={form.quote} onChange={e => setForm({ ...form, quote: e.target.value })} rows={4}
                     style={{ width: '100%', background: 'var(--cr-bg)', border: '1px solid ' + (errors.quote ? 'var(--cr-dim)' : 'var(--cr-bg4)'), color: 'var(--cr-text)', padding: '0.8rem 1rem', fontFamily: 'var(--font-display)', fontSize: '0.9rem', borderRadius: '1px', outline: 'none', resize: 'vertical', minHeight: '100px', boxSizing: 'border-box' }} />
-                  {errors.quote && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', color: 'var(--cr-light)', marginTop: '0.3rem' }}>{errors.quote}</div>}
+                  {errors.quote && <div style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--cr-light)', marginTop: '0.3rem' }}>{errors.quote}</div>}
                 </div>
                 <button type="submit" style={{ width: '100%', padding: '1rem', background: 'var(--cr-primary)', color: '#fff', border: 'none', fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: '0.85rem', letterSpacing: '0.15em', textTransform: 'uppercase', borderRadius: '1px', cursor: 'pointer' }}>
                   Submit Testimonial
@@ -118,7 +130,7 @@ function TestimonialCard({ testimonial, index }: any) {
         </div>
         <div>
           <div style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 'clamp(0.8rem, 2vw, 0.9rem)', color: 'var(--cr-text)' }}>{testimonial.author}</div>
-          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.62rem, 1.5vw, 0.7rem)', color: 'var(--cr-muted)', marginTop: '0.2rem', letterSpacing: '0.05em' }}>{testimonial.role}</div>
+          <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.72rem, 1.5vw, 0.78rem)', color: 'var(--cr-muted)', marginTop: '0.2rem', letterSpacing: '0.05em' }}>{testimonial.role}</div>
         </div>
       </div>
     </motion.div>

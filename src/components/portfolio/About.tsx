@@ -81,10 +81,10 @@ export default function About({ about, heading }: any) {
               { value: about?.projects, label: 'Projects Completed' },
               { value: about?.clients, label: 'Happy Clients' },
               { value: about?.standing, label: 'Academic Standing' },
-            ].map((stat, i) => (
+            ].filter((stat) => stat.value !== null && stat.value !== undefined && String(stat.value).trim() !== '').map((stat, i) => (
               <div key={i} style={{ background: 'var(--cr-bg3)', border: '1px solid var(--cr-bg4)', padding: 'clamp(0.8rem, 2vw, 1.2rem)', borderRadius: '2px' }}>
                 <div style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem, 4vw, 2rem)', fontWeight: 800, color: 'var(--cr-light)' }}>{stat.value}</div>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.6rem, 1.5vw, 0.7rem)', color: 'var(--cr-muted)', letterSpacing: '0.1em', marginTop: '0.2rem' }}>{stat.label}</div>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.72rem, 1.5vw, 0.78rem)', color: 'var(--cr-muted)', letterSpacing: '0.1em', marginTop: '0.2rem' }}>{stat.label}</div>
               </div>
             ))}
           </motion.div>

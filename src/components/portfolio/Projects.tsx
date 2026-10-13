@@ -71,7 +71,7 @@ function ProjectCard({ project, index, onClick }: any) {
         <p style={{ fontSize: 'clamp(0.8rem, 2vw, 0.9rem)', color: 'var(--cr-muted)', lineHeight: 1.6, marginBottom: '1rem' }}>{project.desc}</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
           {project.tags?.map((tag: string, i: number) => (
-            <span key={i} style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.6rem, 1.5vw, 0.65rem)', color: 'var(--cr-light)', border: '1px solid var(--cr-dim)', padding: '0.2rem 0.5rem', borderRadius: '1px' }}>{tag}</span>
+            <span key={i} style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.72rem, 1.5vw, 0.78rem)', color: 'var(--cr-light)', border: '1px solid var(--cr-dim)', padding: '0.2rem 0.5rem', borderRadius: '1px' }}>{tag}</span>
           ))}
         </div>
       </div>
