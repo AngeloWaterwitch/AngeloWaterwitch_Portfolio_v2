@@ -97,8 +97,8 @@ export function ClientsTab({ summary }: { summary: AdminSummary | null }) {
           {clients.map((c) => (
             <button key={c.id} type="button" onClick={() => setSelected(c.id)} style={{ ...card, width: '100%', textAlign: 'left', cursor: 'pointer', display: 'block', color: '#f0ede8' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
-                <strong style={{ fontFamily: "'Syne', sans-serif" }}>{c.name}{summary?.unread?.[c.id] ? <span style={{ marginLeft: '0.6rem', background: 'hsl(348,100%,40%)', color: '#fff', borderRadius: '999px', padding: '0.1rem 0.55rem', fontFamily: "'Space Mono', monospace", fontSize: '0.68rem' }}>{summary.unread[c.id]} new</span> : null}</strong>
-                <span style={{ ...mono, fontSize: '0.68rem', color: CLIENT_STATUS_COLOR[c.status], textTransform: 'uppercase', letterSpacing: '0.1em' }}>{c.deletedAt ? 'ERASED' : c.status}</span>
+                <strong style={{ fontFamily: "'Syne', sans-serif" }}>{c.name}{summary?.unread?.[c.id] ? <span style={{ marginLeft: '0.6rem', background: 'hsl(348,100%,40%)', color: '#fff', borderRadius: '999px', padding: '0.1rem 0.55rem', fontFamily: "'Space Mono', monospace", fontSize: '0.69rem' }}>{summary.unread[c.id]} new</span> : null}</strong>
+                <span style={{ ...mono, fontSize: '0.69rem', color: CLIENT_STATUS_COLOR[c.status], textTransform: 'uppercase', letterSpacing: '0.1em' }}>{c.deletedAt ? 'ERASED' : c.status}</span>
               </div>
               <div style={{ ...mono, fontSize: '0.7rem', color: '#888', marginTop: '0.3rem' }}>
                 {c.email} · {c.projects.length} project{c.projects.length === 1 ? '' : 's'} · code …{c.accessCodeHint}
@@ -236,7 +236,7 @@ function ClientDetail({ id, onBack, onCode, run, summary }: { summary: AdminSumm
       <AdminLabel>Chat</AdminLabel>
       <CallErrorBoundary label="The chat"><AdminChat clientId={id} clientName={client.name} channel={summary?.channel ?? null} callsEnabled={!!summary?.callsEnabled} closed={!active} /></CallErrorBoundary>
       {summary && !summary.callsEnabled && (
-        <p style={{ ...mono, fontSize: '0.68rem', color: '#777', marginTop: '0.6rem', lineHeight: 1.6 }}>Voice and video calls are switched off until the LiveKit settings are added (see the setup notes).</p>
+        <p style={{ ...mono, fontSize: '0.69rem', color: '#777', marginTop: '0.6rem', lineHeight: 1.6 }}>Voice and video calls are switched off until the LiveKit settings are added (see the setup notes).</p>
       )}
 
       <AdminLabel>Documents</AdminLabel>
@@ -325,7 +325,7 @@ function ProjectEditor({ project, run, reload }: { project: any; run: (fn: () =>
         <AdminField label="Project title" value={p.title} onChange={(v) => setP({ ...p, title: v })} fullWidth />
         <AdminField label="Description" value={p.description} onChange={(v) => setP({ ...p, description: v })} textarea fullWidth />
         <div>
-          <div style={{ ...mono, fontSize: '0.68rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Status</div>
+          <div style={{ ...mono, fontSize: '0.69rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Status</div>
           <select value={p.status} onChange={(e) => setP({ ...p, status: e.target.value })} style={selectStyle}>
             {STATUSES.map((s) => <option key={s} value={s}>{PROJECT_STATUS_LABEL[s]}</option>)}
           </select>
@@ -368,7 +368,7 @@ function ProjectEditor({ project, run, reload }: { project: any; run: (fn: () =>
           {project.updates.map((u: any) => (
             <li key={u.id} style={{ borderTop: '1px solid #222', padding: '0.7rem 0', display: 'flex', justifyContent: 'space-between', gap: '1rem' }}>
               <div>
-                <div style={{ ...mono, fontSize: '0.66rem', color: '#777' }}>{formatDateTime(u.createdAt)}{u.progress !== null ? ` · ${u.progress}%` : ''}{u.visibleToClient ? '' : ' · hidden from client'}</div>
+                <div style={{ ...mono, fontSize: '0.69rem', color: '#777' }}>{formatDateTime(u.createdAt)}{u.progress !== null ? ` · ${u.progress}%` : ''}{u.visibleToClient ? '' : ' · hidden from client'}</div>
                 <div style={{ fontFamily: "'Syne', sans-serif", fontSize: '0.88rem', color: '#f0ede8' }}>{u.title}</div>
                 {u.body && <div style={{ fontSize: '0.8rem', color: '#999', whiteSpace: 'pre-line', marginTop: '0.2rem' }}>{u.body}</div>}
               </div>

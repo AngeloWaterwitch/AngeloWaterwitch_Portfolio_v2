@@ -83,7 +83,7 @@ export function FileUpload({
         </div>
         <div style={{
           fontFamily: "'Space Mono', monospace",
-          fontSize: '0.65rem',
+          fontSize: '0.69rem',
           color: '#444',
           marginTop: '0.4rem',
         }}>

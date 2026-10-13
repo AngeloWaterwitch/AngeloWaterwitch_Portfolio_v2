@@ -97,7 +97,7 @@ export function WorkPanel({ projectId, locked }: { projectId: string; locked: bo
               This is overtime {accepted ? `(${hm(data.allowance.remainingMinutes)} confirmed by the client)` : '(needs the client to confirm first)'}
             </label>
           </div>
-          {locked && <p style={{ ...mono, fontSize: '0.68rem', color: '#777', marginTop: '0.5rem' }}>Work cannot be started on a finished or cancelled project.</p>}
+          {locked && <p style={{ ...mono, fontSize: '0.69rem', color: '#777', marginTop: '0.5rem' }}>Work cannot be started on a finished or cancelled project.</p>}
         </div>
       )}
 
@@ -105,7 +105,7 @@ export function WorkPanel({ projectId, locked }: { projectId: string; locked: bo
       {data.overtimeRequests.map((r: any) => (
         <div key={r.id} style={{ border: '1px solid #222', padding: '0.7rem 0.9rem', marginBottom: '0.5rem', display: 'flex', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap' }}>
           <div>
-            <div style={{ ...mono, fontSize: '0.68rem', color: STATUS_COLOR[r.status], textTransform: 'uppercase', letterSpacing: '0.1em' }}>{STATUS_LABEL[r.status]} · ~{hm(r.estimatedMinutes)}</div>
+            <div style={{ ...mono, fontSize: '0.69rem', color: STATUS_COLOR[r.status], textTransform: 'uppercase', letterSpacing: '0.1em' }}>{STATUS_LABEL[r.status]} · ~{hm(r.estimatedMinutes)}</div>
             <div style={{ fontSize: '0.85rem', color: '#ddd', marginTop: '0.2rem' }}>{r.reason}</div>
             {r.clientNote && <div style={{ fontSize: '0.78rem', color: '#999', marginTop: '0.2rem' }}>Client note: {r.clientNote}</div>}
           </div>
@@ -118,7 +118,7 @@ export function WorkPanel({ projectId, locked }: { projectId: string; locked: bo
             <AdminField label="Why is overtime needed?" value={ot.reason} onChange={(v) => setOt({ ...ot, reason: v })} textarea fullWidth />
             <AdminField label="Estimated hours" value={ot.hours} onChange={(v) => setOt({ ...ot, hours: v })} placeholder="3" />
             <div>
-              <div style={{ ...mono, fontSize: '0.68rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Planned for (optional)</div>
+              <div style={{ ...mono, fontSize: '0.69rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>Planned for (optional)</div>
               <input type="datetime-local" value={ot.plannedFor} onChange={(e) => setOt({ ...ot, plannedFor: e.target.value })}
                 style={{ width: '100%', background: '#0a0a0a', border: '1px solid #222', color: '#f0ede8', padding: '0.55rem 0.8rem', borderRadius: '1px', fontFamily: "'Syne', sans-serif", fontSize: '0.85rem', colorScheme: 'dark' }} />
             </div>
@@ -150,7 +150,7 @@ export function WorkPanel({ projectId, locked }: { projectId: string; locked: bo
           <AdminGrid>
             {(['start', 'end'] as const).map((k) => (
               <div key={k}>
-                <div style={{ ...mono, fontSize: '0.68rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>{k === 'start' ? 'Started' : 'Finished'}</div>
+                <div style={{ ...mono, fontSize: '0.69rem', color: '#666', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.4rem' }}>{k === 'start' ? 'Started' : 'Finished'}</div>
                 <input type="datetime-local" value={manual[k]} onChange={(e) => setManual({ ...manual, [k]: e.target.value })}
                   style={{ width: '100%', background: '#0a0a0a', border: '1px solid #222', color: '#f0ede8', padding: '0.55rem 0.8rem', borderRadius: '1px', fontFamily: "'Syne', sans-serif", fontSize: '0.85rem', colorScheme: 'dark' }} />
               </div>
@@ -175,7 +175,7 @@ export function WorkPanel({ projectId, locked }: { projectId: string; locked: bo
         <ul style={{ listStyle: 'none', padding: 0, margin: '0.8rem 0 0' }}>
           {data.log.slice(0, 30).map((e: any) => (
             <li key={e.id} style={{ borderTop: '1px solid #1f1f1f', padding: '0.4rem 0', fontSize: '0.8rem', color: '#ccc' }}>
-              <span style={{ ...mono, fontSize: '0.66rem', color: '#777' }}>{formatDateTime(e.createdAt)}</span>{'  '}{e.message}{e.visibleToClient ? '' : ' (hidden from client)'}
+              <span style={{ ...mono, fontSize: '0.69rem', color: '#777' }}>{formatDateTime(e.createdAt)}</span>{'  '}{e.message}{e.visibleToClient ? '' : ' (hidden from client)'}
             </li>
           ))}
         </ul>
