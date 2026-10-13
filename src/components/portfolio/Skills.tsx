@@ -47,7 +47,7 @@ function SkillCard({ skill, index }: any) {
       ) : (
         <span style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', display: 'block', marginBottom: '0.6rem' }}>{skill.icon}</span>
       )}
-      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.6rem, 1.5vw, 0.7rem)', color: hovered ? 'var(--cr-light)' : '#888', letterSpacing: '0.1em', transition: 'color 0.2s' }}>
+      <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.72rem, 1.5vw, 0.78rem)', color: hovered ? 'var(--cr-light)' : '#888', letterSpacing: '0.1em', transition: 'color 0.2s' }}>
         {skill.name}
       </div>
     </motion.div>

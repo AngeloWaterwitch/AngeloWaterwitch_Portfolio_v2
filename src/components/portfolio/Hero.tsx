@@ -42,7 +42,7 @@ export default function Hero({ hero, resume }: any) {
           transition={{ duration: 0.6, delay: 0.1 }}
           style={{
             fontFamily: 'var(--font-mono)',
-            fontSize: 'clamp(0.65rem, 2vw, 0.8rem)',
+            fontSize: 'clamp(0.72rem, 2vw, 0.8rem)',
             color: 'var(--cr-light)',
             letterSpacing: '0.2em',
             marginBottom: '1.5rem',
@@ -176,7 +176,7 @@ export default function Hero({ hero, resume }: any) {
           background: 'linear-gradient(to bottom, var(--cr-primary), transparent)',
           animation: 'scrollPulse 2s ease-in-out infinite',
         }} />
-        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--cr-muted)', letterSpacing: '0.15em' }}>
+        <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--cr-muted)', letterSpacing: '0.15em' }}>
           SCROLL
         </span>
       </div>
