@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { Icon } from '@/components/Icon';
 
 type Props = {
   url: string;
@@ -121,7 +122,7 @@ export default function CallOverlay({ url, token, kind, peerName, onHangUp, onRe
   };
 
   const status = error ? '' : phase === 'connecting' ? 'Connecting...' : phase === 'waiting' ? `Calling ${peerName}...` : clock(seconds);
-  const btn = (bg: string): React.CSSProperties => ({ width: '3.4rem', height: '3.4rem', borderRadius: '50%', border: 'none', background: bg, color: '#fff', fontSize: '1.2rem', cursor: 'pointer' });
+  const btn = (bg: string): React.CSSProperties => ({ width: '3.4rem', height: '3.4rem', borderRadius: '50%', border: 'none', background: bg, color: '#fff', fontSize: '1.2rem', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' });
 
   return (
     <div role="dialog" aria-modal="true" aria-label={`${kind === 'VIDEO' ? 'Video' : 'Voice'} call with ${peerName}`}
@@ -146,9 +147,9 @@ export default function CallOverlay({ url, token, kind, peerName, onHangUp, onRe
       )}
 
       <div style={{ position: 'relative', zIndex: 2, display: 'flex', justifyContent: 'center', gap: '1.2rem', padding: '1.5rem 1rem calc(1.5rem + env(safe-area-inset-bottom))' }}>
-        <button type="button" onClick={toggleMic} aria-pressed={muted} aria-label={muted ? 'Unmute microphone' : 'Mute microphone'} style={btn(muted ? '#555' : '#2a2a30')}>{muted ? '🔇' : '🎤'}</button>
-        {kind === 'VIDEO' && <button type="button" onClick={toggleCam} aria-pressed={!camOn} aria-label={camOn ? 'Turn camera off' : 'Turn camera on'} style={btn(camOn ? '#2a2a30' : '#555')}>{camOn ? '📷' : '🚫'}</button>}
-        <button type="button" onClick={onHangUp} aria-label="End call" style={btn('#d1132f')}>📞</button>
+        <button type="button" onClick={toggleMic} aria-pressed={muted} aria-label={muted ? 'Unmute microphone' : 'Mute microphone'} style={btn(muted ? '#555' : '#2a2a30')}>{muted ? <Icon name="micOff" size={24} /> : <Icon name="mic" size={24} />}</button>
+        {kind === 'VIDEO' && <button type="button" onClick={toggleCam} aria-pressed={!camOn} aria-label={camOn ? 'Turn camera off' : 'Turn camera on'} style={btn(camOn ? '#2a2a30' : '#555')}>{camOn ? <Icon name="video" size={24} /> : <Icon name="videoOff" size={24} />}</button>}
+        <button type="button" onClick={onHangUp} aria-label="End call" style={btn('#d1132f')}><Icon name="hangup" size={24} /></button>
       </div>
     </div>
   );

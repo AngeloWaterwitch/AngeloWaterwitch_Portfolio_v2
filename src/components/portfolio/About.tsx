@@ -2,6 +2,7 @@
  
 import { motion } from 'framer-motion';
 import { DEFAULT_HEADINGS } from '@/lib/siteSettings';
+import { Icon } from '@/components/Icon';
  
 const fadeUp = {
   hidden: { opacity: 0, y: 40 },
@@ -44,7 +45,7 @@ export default function About({ about, heading }: any) {
             {about?.photoUrl ? (
               <img src={about.photoUrl} alt="Angelo Waterwitch" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
             ) : (
-              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '6rem' }}>👤</div>
+              <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--cr-muted)' }}><Icon name="user" size="clamp(4rem, 14vw, 6rem)" /></div>
             )}
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, var(--cr-dim) 0%, transparent 50%)', zIndex: 2 }} />
           </div>

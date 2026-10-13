@@ -13,6 +13,7 @@ import { ClientsTab } from './components/ClientsTab';
 import { BusinessTab } from './components/BusinessTab';
 import { AdminCallListener, type AdminSummary } from './components/AdminCallListener';
 import CallErrorBoundary from '@/components/chat/CallErrorBoundary';
+import { Icon } from '@/components/Icon';
 
 export default function AdminPage() {
   const [data, setData] = useState<any>(null);
@@ -111,7 +112,7 @@ export default function AdminPage() {
           fontSize: '1.1rem',
           color: '#f0ede8',
         }}>
-          ⚙ Admin <span style={{ color: 'hsl(348,100%,55%)' }}>Dashboard</span>
+          <Icon name="settings" size={18} style={{ marginRight: '0.5rem', color: 'hsl(348,100%,55%)' }} />Admin <span style={{ color: 'hsl(348,100%,55%)' }}>Dashboard</span>
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <a
@@ -335,7 +336,7 @@ function SkillsTab({ data, onRefetch }: any) {
     const res = await fetch('/api/skills', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ icon: '💡', name: 'New Skill', order: skills.length + 1 }),
+      body: JSON.stringify({ icon: '', name: 'New Skill', order: skills.length + 1 }),
     });
     const skill = await res.json();
     setSkills([...skills, skill]);
@@ -363,7 +364,7 @@ function SkillsTab({ data, onRefetch }: any) {
                 arr[i] = { ...arr[i], icon: e.target.value };
                 setSkills(arr);
               }}
-              placeholder="emoji or image URL"
+              placeholder="image URL (optional)"
               style={{ width: '140px', background: '#0a0a0a', border: '1px solid #222', color: '#f0ede8', padding: '0.5rem', fontFamily: "'Syne', sans-serif", fontSize: '0.85rem', borderRadius: '1px', outline: 'none' }}
             />
             <input

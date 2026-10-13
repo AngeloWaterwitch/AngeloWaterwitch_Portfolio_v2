@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import ChatPanel, { type ChatApi } from '@/components/chat/ChatPanel';
 import CallErrorBoundary from '@/components/chat/CallErrorBoundary';
+import { Icon } from '@/components/Icon';
 
 const SEEN_KEY = 'aw_chat_seen';
 const json = { 'Content-Type': 'application/json' };
@@ -71,7 +72,7 @@ export default function ChatLauncher() {
         aria-label={open ? 'Close chat' : unread ? `Open chat with Angelo, ${unread} new message${unread === 1 ? '' : 's'}` : 'Open chat with Angelo'}
         style={{ position: 'fixed', right: '16px', bottom: '16px', zIndex: 1600, width: '56px', height: '56px', borderRadius: '50%', border: 'none', background: 'var(--cr-primary, #cc0033)', color: '#fff', fontSize: '1.4rem', cursor: 'pointer', boxShadow: '0 6px 24px rgba(0,0,0,0.5)' }}
       >
-        {open ? '✕' : '💬'}
+        {open ? <Icon name="close" size={22} /> : <Icon name="chat" size={24} />}
         {!open && unread > 0 && (
           <span aria-hidden style={{ position: 'absolute', top: '-4px', right: '-4px', minWidth: '22px', height: '22px', padding: '0 6px', borderRadius: '999px', background: '#fff', color: '#cc0033', fontFamily: "'Space Mono', monospace", fontSize: '0.72rem', fontWeight: 700, display: 'grid', placeItems: 'center' }}>
             {unread > 9 ? '9+' : unread}

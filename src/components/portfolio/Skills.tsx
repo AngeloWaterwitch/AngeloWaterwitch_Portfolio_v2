@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { DEFAULT_HEADINGS } from '@/lib/siteSettings';
+import { SkillIcon } from '@/components/Icon';
  
 export default function Skills({ skills, heading }: any) {
   const h = heading ?? DEFAULT_HEADINGS.skills;
@@ -45,7 +46,7 @@ function SkillCard({ skill, index }: any) {
       {skill.icon?.startsWith('http') ? (
         <img src={skill.icon} alt={skill.name} style={{ width: 'clamp(1.5rem, 4vw, 2rem)', height: 'clamp(1.5rem, 4vw, 2rem)', objectFit: 'contain', display: 'block', margin: '0 auto 0.6rem' }} />
       ) : (
-        <span style={{ fontSize: 'clamp(1.5rem, 4vw, 2rem)', display: 'block', marginBottom: '0.6rem' }}>{skill.icon}</span>
+        <SkillIcon name={skill.name} />
       )}
       <div style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(0.72rem, 1.5vw, 0.78rem)', color: hovered ? 'var(--cr-light)' : '#888', letterSpacing: '0.1em', transition: 'color 0.2s' }}>
         {skill.name}
