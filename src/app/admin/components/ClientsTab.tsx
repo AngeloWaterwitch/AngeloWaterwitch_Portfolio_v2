@@ -33,10 +33,26 @@ async function api(path: string, method = 'GET', body?: unknown) {
   });
   const json = await res.json().catch(() => ({}));
   if (!res.ok) {
-    const issue = json?.issues?.[0]?.message;
-    throw new Error(json?.error ? (issue ? `${json.error}: ${issue}` : json.error) : 'Request failed');
+    throw new Error(describeError(json));
   }
   return json;
+}
+
+const FIELD_LABEL: Record<string, string> = {
+  name: 'Full name', email: 'Email', phone: 'Phone', company: 'Company', title: 'Project title',
+  description: 'Description', totalRands: 'Total price', depositRands: 'Deposit', project: 'Project',
+};
+
+/** Turns the server's validation answer into a sentence that names the field and says what to fix. */
+function describeError(json: any): string {
+  const issue = json?.issues?.[0];
+  if (!json?.error) return 'Request failed';
+  if (!issue) return json.error;
+  const field = [...(issue.path ?? [])].reverse().map((k: string) => FIELD_LABEL[k]).find(Boolean) ?? '';
+  const msg = String(issue.message ?? '');
+  const min = msg.match(/>=\s*(\d+)\s*characters/);
+  const fix = min ? `needs at least ${min[1]} characters` : /email/i.test(msg) ? 'is not a valid email address' : msg;
+  return field ? `${field} ${fix}.` : `${json.error}: ${msg}`;
 }
 
 const toRands = (cents: number) => String(cents / 100);
