@@ -8,7 +8,7 @@
 - The home page carries structured data (schema.org `Person` and `WebSite`) that tells Google who you are, where you are, and which profiles are yours (LinkedIn, GitHub, Facebook, Instagram). This is the main thing that helps a search for your name.
 - `/privacy` (POPIA privacy policy) and `/terms` (website terms of use) are public pages, linked from the footer. They read your name, location and Information Officer from the Business & Legal tab. Contact and CV forms point to the privacy policy.
 
-The address used in the sitemap and canonical links comes from `NEXTAUTH_URL` on Vercel. If you add a custom domain later, change that one setting (and redeploy) and everything follows.
+The address used in the sitemap and canonical links is taken from `NEXT_PUBLIC_SITE_URL` if you set it, otherwise from `NEXTAUTH_URL`, otherwise from the address Vercel gives the production deployment (a `localhost` value is ignored). When you add a custom domain later, set `NEXT_PUBLIC_SITE_URL` to `https://your-domain` on Vercel and redeploy.
 
 ## 1. Google Search Console (about 10 minutes)
 
