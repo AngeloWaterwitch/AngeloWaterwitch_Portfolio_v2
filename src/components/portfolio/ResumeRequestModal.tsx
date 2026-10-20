@@ -150,6 +150,9 @@ export default function ResumeRequestModal({ resumeLabel, onClose }: Props) {
               <p style={{ color: 'var(--cr-muted)', fontSize: '0.82rem', marginBottom: '1.75rem', lineHeight: 1.6 }}>
                 Fill in your details and Angelo will email you a secure download link.
               </p>
+              <p style={{ color: 'var(--cr-muted)', fontSize: '0.74rem', marginTop: '-1.2rem', marginBottom: '1.5rem', lineHeight: 1.6 }}>
+                Your details are used only for this request. See the <a href="/privacy" target="_blank" rel="noreferrer noopener" style={{ color: 'var(--cr-light)', textDecoration: 'underline' }}>Privacy Policy</a>.
+              </p>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <input

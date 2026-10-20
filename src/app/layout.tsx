@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
 import { getThemeAndBranding, fontsUrl } from '@/lib/theme-data';
+import { siteUrl } from '@/lib/site-url';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl()),
   title: 'Angelo Waterwitch',
   description: 'Software & Design Engineer',
+  ...(process.env.GOOGLE_SITE_VERIFICATION ? { verification: { google: process.env.GOOGLE_SITE_VERIFICATION.trim().replace(/^["']+|["']+$/g, '') } } : {}),
 };
 
 export default async function RootLayout({
