@@ -119,6 +119,9 @@ export default function Contact({ contact, heading }: any) {
               style={{ width: '100%', padding: '1rem', background: status === 'sending' ? '#333' : 'var(--cr-primary)', color: '#fff', border: 'none', fontFamily: 'var(--font-display)', fontSize: 'clamp(0.8rem, 2vw, 0.85rem)', fontWeight: 700, letterSpacing: '0.15em', textTransform: 'uppercase', borderRadius: '1px', cursor: status === 'sending' ? 'not-allowed' : 'pointer', transition: 'background 0.2s' }}>
               {status === 'sending' ? 'Sending...' : 'Send Message'}
             </button>
+            <p style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--cr-muted)', lineHeight: 1.6, marginTop: '0.9rem', textAlign: 'center' }}>
+              Your details are used only to reply to you. See the <a href="/privacy" style={{ color: 'var(--cr-light)', textDecoration: 'underline' }}>Privacy Policy</a>. Protected by reCAPTCHA (Google <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer noopener" style={{ color: 'var(--cr-light)', textDecoration: 'underline' }}>Privacy</a> and <a href="https://policies.google.com/terms" target="_blank" rel="noreferrer noopener" style={{ color: 'var(--cr-light)', textDecoration: 'underline' }}>Terms</a> apply).
+            </p>
             {status === 'success' && <p role="status" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: '#4caf50', marginTop: '1rem', textAlign: 'center' }}>✓ Message sent! I'll be in touch soon.</p>}
             {status === 'error' && <p role="alert" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--cr-light)', marginTop: '1rem', textAlign: 'center' }}>✕ Something went wrong. Please try again.</p>}
           </form>

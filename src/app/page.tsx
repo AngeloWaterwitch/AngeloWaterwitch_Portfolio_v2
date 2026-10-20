@@ -10,20 +10,35 @@ import Testimonials from '@/components/portfolio/Testimonials';
 import Contact from '@/components/portfolio/Contact';
 import Footer from '@/components/portfolio/Footer';
 import { headingFor } from '@/lib/siteSettings';
+import { siteUrl } from '@/lib/site-url';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export async function generateMetadata() {
   const data = await getSiteData();
+  const title = data.seo?.title || 'Angelo Waterwitch | Web Developer & Software Engineer';
+  const description = data.seo?.description || 'Angelo Waterwitch is a web developer and software & design engineer in Springbok, Northern Cape, South Africa.';
   return {
-    title: data.seo?.title || 'Angelo Waterwitch',
-    description: data.seo?.description || 'Software & Design Engineer',
+    title,
+    description,
     keywords: data.seo?.keywords || '',
+    alternates: { canonical: '/' },
     openGraph: {
-      title: data.seo?.title || 'Angelo Waterwitch',
-      description: data.seo?.description || '',
-      images: data.seo?.ogImage ? [data.seo.ogImage] : [],
+      type: 'website',
+      siteName: 'Angelo Waterwitch',
+      locale: 'en_ZA',
+      url: '/',
+      title,
+      description,
+      // With no image chosen in the admin, the generated preview picture is used.
+      ...(data.seo?.ogImage ? { images: [data.seo.ogImage] } : {}),
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      ...(data.seo?.twitterHandle ? { creator: data.seo.twitterHandle } : {}),
     },
   };
 }
@@ -44,11 +59,34 @@ export default async function Home() {
 
   const visibleSections = data.sections?.filter(s => s.visible) || [];
 
+  // Structured data so search engines know who this site is about (helps results for your name).
+  const base = siteUrl();
+  const socials = [data.contact?.linkedin, data.contact?.github, data.contact?.facebook, data.contact?.instagram].filter((u): u is string => !!u && u.startsWith('http'));
+  const person: Record<string, unknown> = {
+    '@type': 'Person',
+    '@id': base + '/#person',
+    name: data.hero?.name || 'Angelo Waterwitch',
+    jobTitle: data.hero?.role || 'Software & Design Engineer',
+    url: base + '/',
+    ...(data.about?.photoUrl ? { image: data.about.photoUrl } : {}),
+    ...(socials.length ? { sameAs: socials } : {}),
+    address: { '@type': 'PostalAddress', addressLocality: 'Springbok', addressRegion: 'Northern Cape', addressCountry: 'ZA' },
+    knowsAbout: (data.skills ?? []).map((k: { name: string }) => k.name),
+  };
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      person,
+      { '@type': 'WebSite', '@id': base + '/#website', url: base + '/', name: 'Angelo Waterwitch', inLanguage: 'en-ZA', publisher: { '@id': base + '/#person' } },
+    ],
+  };
+
   const fontFamily = data.branding?.displayFont || 'Syne';
   const monoFont = data.branding?.monoFont || 'Space Mono';
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, '\\u003c') }} />
       <style>{`
         :root {
           --cr: ${data.theme?.primaryColor || 'hsl(348, 100%, 40%)'};

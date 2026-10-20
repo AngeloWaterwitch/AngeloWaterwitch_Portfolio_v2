@@ -104,6 +104,8 @@ export default function Footer({ sections, contact, branding, settings }: any) {
             </nav>
           )}
 
+          <a href="/privacy" style={{ ...smallText, textDecoration: 'none', textTransform: 'uppercase' }} onMouseEnter={hoverOn} onMouseLeave={hoverOff}>Privacy Policy</a>
+          <a href="/terms" style={{ ...smallText, textDecoration: 'none', textTransform: 'uppercase' }} onMouseEnter={hoverOn} onMouseLeave={hoverOff}>Terms of Use</a>
           <a href="/client/login" style={{ ...smallText, textDecoration: 'none', textTransform: 'uppercase' }} onMouseEnter={hoverOn} onMouseLeave={hoverOff}>Client Portal</a>
 
           {s.showFooterCredit && s.footerCredit && <p style={smallText}>{s.footerCredit}</p>}
